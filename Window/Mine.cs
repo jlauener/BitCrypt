@@ -1,62 +1,53 @@
-﻿using System;
+﻿using Microsoft.Xna.Framework;
+using System;
 
 class Mine : Window
 {
 	private const string TITLE_FORMAT = "Mine v1.{0}";
-	private const string COIN_FORMAT = "Coin ({0}/{1})";
+	private const string COIN_PER_SEC_FORMAT = "{0} coin/sec";
 	private const string UPGRADE_FORMAT = "Upgrade ({0})";
 
-	public int Coin { get; private set; }
-	public int CoinMax { get; private set; } = 100;
-	public float CoinPerSec { get; private set; } = 10f;
+	public IntValue Coin { get; } = new IntValue(0, 128);
+	public float CoinPerSec { get; private set; } = 16f;
 
 	private float coinCounter;
 
 	private int level = 0;
-	private int upgradeCost = 200;
+	private int upgradeCost = 256;
 
-	private readonly Label coinLabel;
+	private readonly TextLabel coinPerSecLabel;
 	private readonly Button transferButton;
 	private readonly Button upgradeButton;
 
 	public Mine()
 	{
-		Skin = Computer.Instance.PlayerSkin;
 		Title = string.Format(TITLE_FORMAT, level);
 
-		(coinLabel = Add<Label>())
-			.SetText(string.Format(COIN_FORMAT, Coin, CoinMax))
+		(coinPerSecLabel = Add<TextLabel>())
+			.SetText(COIN_PER_SEC_FORMAT, CoinPerSec)
 			.SetSize(88, 8)
 		;
 
-		(transferButton = Add<Button>())
-			.SetOnPressed(() =>
-			{
-				Coin -= Computer.Coin.Add(Coin);
-				coinLabel.Text = string.Format(COIN_FORMAT, Coin, CoinMax);
-			})
+		var coinBar = new Bar(Coin) // TODO cannot add directly because of Bar's OnAdded relying on Parent's size..
 			.SetSize(88, 12)
-			.Add<Label>().SetText("transfer").Center();
+		;
+		Add(coinBar) // TODO need to call it before adding the label to have the skin working...
+			.Add<ValueLabel>()
+			.SetFormat("coin ({0}/{1})")
+			.SetValue(Coin)
+			.Center()
+		;
+
+		(transferButton = Add<Button>())
+			.SetOnPressed(() => Coin.MoveTo(Computer.Coin))
+			.SetSize(88, 12)
+			.Add<TextLabel>().SetText("transfer").Center();
 		;
 
 		(upgradeButton = Add<Button>())
-			.SetOnPressed(() =>
-			{
-				if (Computer.Coin.Pay(upgradeCost))
-				{
-					level++;
-					Title = string.Format(TITLE_FORMAT, level);
-
-					CoinMax *= 2;
-					CoinPerSec *= 1.1f;
-					coinLabel.SetText(string.Format(COIN_FORMAT, Coin, CoinMax));
-
-					upgradeCost *= 2;
-					upgradeButton.Get<Label>().SetText(UPGRADE_FORMAT, upgradeCost);
-				}
-			})
+			.SetOnPressed(Upgrade)
 			.SetSize(88, 12)
-			.Add<Label>().SetText(UPGRADE_FORMAT, upgradeCost).Center();
+			.Add<TextLabel>().SetText(UPGRADE_FORMAT, upgradeCost).Center();
 		;
 
 		Pack();
@@ -66,13 +57,32 @@ class Mine : Window
 	{
 		base.Update();
 
-		coinCounter += Time.DeltaTime * 10f;
+		coinCounter += Time.DeltaTime * CoinPerSec;
 		var coinToAdd = (int)Math.Floor(coinCounter);
 		if (coinToAdd > 0)
 		{
 			coinCounter -= coinToAdd;
-			Coin = Math.Min(Coin + coinToAdd, CoinMax);
-			coinLabel.Text = string.Format(COIN_FORMAT, Coin, CoinMax);
+			Coin.Add(coinToAdd);
+		}
+
+		var labelColor = Coin.Value == Coin.Max ? Color.Red : Skin.TextColor;
+		transferButton.Get<Label>().Color = labelColor;
+		coinPerSecLabel.Color = labelColor;
+	}
+
+	private void Upgrade()
+	{
+		if (Computer.Coin.Pay(upgradeCost))
+		{
+			level++;
+			Title = string.Format(TITLE_FORMAT, level);
+
+			Coin.ModifyMax(Coin.Max);
+			CoinPerSec *= 1.5f;
+			coinPerSecLabel.SetText(COIN_PER_SEC_FORMAT, CoinPerSec);
+
+			upgradeCost *= 2;
+			upgradeButton.Get<TextLabel>().SetText(UPGRADE_FORMAT, upgradeCost);
 		}
 	}
 }

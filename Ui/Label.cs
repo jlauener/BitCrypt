@@ -15,19 +15,9 @@ enum Vertical
 	Bottom
 }
 
-class Label : Widget
+abstract class Label : Widget
 {
-	public string Text { get; set; }
-	public Label SetText(string text)
-	{
-		Text = text;
-		return this;
-	}
-
-	public Label SetText(string format, params object[] args)
-	{
-		return SetText(string.Format(format, args));
-	}
+	protected string text;
 
 	public Horizontal HorizontalAlign { get; set; } = Horizontal.Left;
 	public Label SetHorizontalAlign(Horizontal align)
@@ -52,10 +42,10 @@ class Label : Widget
 
 	public override void Draw(SpriteBatch spriteBatch)
 	{
-		if (Text != null)
+		if (text != null)
 		{
 			var position = ScreenPosition;
-			var size = Skin.Font.GetSize(Text); // TODO Cache text size, again use dirty flag + Repaint() method !
+			var size = Skin.Font.GetSize(text); // TODO Cache text size, again use dirty flag + Repaint() method !
 
 			switch (HorizontalAlign)
 			{
@@ -77,12 +67,82 @@ class Label : Widget
 					break;
 			}
 
-			spriteBatch.DrawText(Skin.Font, position, Text, Skin.Color);
+			spriteBatch.DrawText(Skin.Font, position, text, Color);
 		}
+	}
+
+	protected override void ApplySkin()
+	{
+		base.ApplySkin();
+		Color = Skin.TextColor;
 	}
 
 	public override string ToString()
 	{
-		return string.Format("[Label pos={0} text={1}]", ScreenPosition, Text);
+		return string.Format("[Label pos={0} text={1}]", ScreenPosition, text);
+	}
+}
+
+class TextLabel : Label
+{
+	public string Text
+	{
+		get => text;
+		set => text = value;
+	}
+
+	public TextLabel SetText(string text)
+	{
+		Text = text;
+		return this;
+	}
+
+	public TextLabel SetText(string format, params object[] args)
+	{
+		return SetText(string.Format(format, args));
+	}
+}
+
+class ValueLabel : Label
+{
+	private IntValue value;
+	public IntValue Value
+	{
+		get => value;
+		set
+		{
+			if (this.value != value)
+			{
+				if (this.value != null) this.value.OnChanged -= HandleValueChanged;
+				value.OnChanged += HandleValueChanged;
+				text = string.Format(Format, value.Value, value.Max, value.Free);
+				this.value = value;
+			}
+		}
+	}
+
+	public ValueLabel SetValue(IntValue value)
+	{
+		Value = value;
+		return this;
+	}
+
+	public string Format { get; set; } = "{0}/{1}";
+
+	public ValueLabel SetFormat(string format)
+	{
+		Format = format;
+		return this;
+	}
+
+	public override void OnRemoved()
+	{
+		base.OnRemoved();
+		value.OnChanged -= HandleValueChanged;
+	}
+
+	private void HandleValueChanged(IntValueChangedEvent evt)
+	{
+		text = string.Format(Format, Value.Value, Value.Max, Value.Free);
 	}
 }

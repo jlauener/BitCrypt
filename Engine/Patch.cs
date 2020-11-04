@@ -1,6 +1,8 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
+// TODO support all possible cutout (needed ?)
+// might refactor how Patches work...
 abstract class Patch
 {
 	private readonly Texture2D texture;
@@ -14,24 +16,42 @@ abstract class Patch
 		this.patchSize = patchSize;
 	}
 
-	public abstract void Draw(SpriteBatch spriteBatch, Vector2 position, Point size);
+	public abstract void Draw(SpriteBatch spriteBatch, Vector2 position, Point size, Color color, Rectangle? cutOut);
 
-	protected void DrawQuad(SpriteBatch spriteBatch, Vector2 position, int x, int y, int quadX, int quadY)
+	protected void DrawQuad(SpriteBatch spriteBatch, Vector2 position, Color color, Rectangle? cutOut, int x, int y, int quadX, int quadY)
 	{
-		spriteBatch.Draw(
-			texture,
-			new Vector2(position.X + x * patchSize, position.Y + y * patchSize),
-			new Rectangle(origin.X + quadX * patchSize, origin.Y + quadY * patchSize, patchSize, patchSize),
-			Color.White
-		);
+		x *= patchSize;
+		y *= patchSize;
+		var sourceRect = new Rectangle(origin.X + quadX * patchSize, origin.Y + quadY * patchSize, patchSize, patchSize);
+
+		if (cutOut.HasValue)
+		{
+			if (x > cutOut.Value.Right)
+			{
+				return;
+			}
+			else if (x + patchSize > cutOut.Value.Right)
+			{
+				sourceRect.Width -= (x + patchSize) - cutOut.Value.Right;
+			}
+		}
+
+		position.X += x;
+		position.Y += y;
+		spriteBatch.Draw(texture, position, sourceRect, color);
 	}
 }
 
 static class PatchExtensions
 {
-	public static void Draw(this SpriteBatch spriteBatch, Patch patch, Vector2 position, Point size)
+	public static void Draw(this SpriteBatch spriteBatch, Patch patch, Vector2 position, Point size, Color color)
 	{
-		patch.Draw(spriteBatch, position, size);
+		patch.Draw(spriteBatch, position, size, color, null);
+	}
+
+	public static void Draw(this SpriteBatch spriteBatch, Patch patch, Vector2 position, Point size, Color color, Rectangle? cutRect)
+	{
+		patch.Draw(spriteBatch, position, size, color, cutRect);
 	}
 }
 
@@ -39,22 +59,22 @@ class SixPatch : Patch
 {
 	public SixPatch(Texture2D texture, Point origin, int patchSize) : base(texture, origin, patchSize) { }
 
-	public override void Draw(SpriteBatch spriteBatch, Vector2 position, Point size)
+	public override void Draw(SpriteBatch spriteBatch, Vector2 position, Point size, Color color, Rectangle? cutOut)
 	{
 		int w = size.X / patchSize;
 		int h = size.Y / patchSize;
 
 		// corners
-		DrawQuad(spriteBatch, position, 0, 0, 0, 0);
-		DrawQuad(spriteBatch, position, w - 1, 0, 2, 0);
-		DrawQuad(spriteBatch, position, 0, h - 1, 0, 1);
-		DrawQuad(spriteBatch, position, w - 1, h - 1, 2, 1);
+		DrawQuad(spriteBatch, position, color, cutOut, 0, 0, 0, 0);
+		DrawQuad(spriteBatch, position, color, cutOut, w - 1, 0, 2, 0);
+		DrawQuad(spriteBatch, position, color, cutOut, 0, h - 1, 0, 1);
+		DrawQuad(spriteBatch, position, color, cutOut, w - 1, h - 1, 2, 1);
 
 		// center
 		for (var ix = 1; ix < w - 1; ix++)
 		{
-			DrawQuad(spriteBatch, position, ix, 0, 1, 0);
-			DrawQuad(spriteBatch, position, ix, h - 1, 1, 1);
+			DrawQuad(spriteBatch, position, color, cutOut, ix, 0, 1, 0);
+			DrawQuad(spriteBatch, position, color, cutOut, ix, h - 1, 1, 1);
 		}
 	}
 }
@@ -63,29 +83,29 @@ class NinePatch : Patch
 {
 	public NinePatch(Texture2D texture, Point origin, int patchSize) : base(texture, origin, patchSize) {}
 
-	public override void Draw(SpriteBatch spriteBatch, Vector2 position, Point size)
+	public override void Draw(SpriteBatch spriteBatch, Vector2 position, Point size, Color color, Rectangle? cutOut)
 	{
 		int w = size.X / patchSize;
 		int h = size.Y / patchSize;
 
 		// corners
-		DrawQuad(spriteBatch, position, 0, 0, 0, 0);
-		DrawQuad(spriteBatch, position, w - 1, 0, 2, 0);
-		DrawQuad(spriteBatch, position, 0, h - 1, 0, 2);
-		DrawQuad(spriteBatch, position, w - 1, h - 1, 2, 2);
+		DrawQuad(spriteBatch, position, color, cutOut, 0, 0, 0, 0);
+		DrawQuad(spriteBatch, position, color, cutOut, w - 1, 0, 2, 0);
+		DrawQuad(spriteBatch, position, color, cutOut, 0, h - 1, 0, 2);
+		DrawQuad(spriteBatch, position, color, cutOut, w - 1, h - 1, 2, 2);
 
 		// top, bottom
 		for (var ix = 1; ix < w - 1; ix++)
 		{
-			DrawQuad(spriteBatch, position, ix, 0, 1, 0);
-			DrawQuad(spriteBatch, position, ix, h - 1, 1, 2);
+			DrawQuad(spriteBatch, position, color, cutOut, ix, 0, 1, 0);
+			DrawQuad(spriteBatch, position, color, cutOut, ix, h - 1, 1, 2);
 		}
 
 		// left, right
 		for (var iy = 1; iy < h - 1; iy++)
 		{
-			DrawQuad(spriteBatch, position, 0, iy, 0, 1);
-			DrawQuad(spriteBatch, position, w - 1, iy, 2, 1);
+			DrawQuad(spriteBatch, position, color, cutOut, 0, iy, 0, 1);
+			DrawQuad(spriteBatch, position, color, cutOut, w - 1, iy, 2, 1);
 		}
 
 		// center
@@ -93,7 +113,7 @@ class NinePatch : Patch
 		{
 			for (var ix = 1; ix < w - 1; ix++)
 			{
-				DrawQuad(spriteBatch, position, ix, iy, 1, 1);
+				DrawQuad(spriteBatch, position, color, cutOut, ix, iy, 1, 1);
 			}
 		}
 	}

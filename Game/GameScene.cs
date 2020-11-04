@@ -1,9 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
-using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 
 // TODO improve handling of mouse pressed/released event
 // should be able to keep the mouse down, go out of the widget -> mouse released
@@ -21,48 +19,78 @@ class GameScene : Scene
 	private Widget statusBar;
 	private Widget desktop;
 
-	private Label statusLabel;
-	private Label debugLabel;
+	//private TextLabel statusLabel;
+	private TextLabel debugLabel;
+
+	//private IntValue barValue;
 
 	public override void Init()
 	{
 		base.Init();
 
-		Computer.Instance = new Computer(1024, 1000, 500);
-
-		Core.BackgroundColor = Computer.Instance.DesktopColor;
+		Core.BackgroundColor = Computer.DesktopColor;
 
 		rootWidget = new Widget().SetSize(Core.ScreenSize);
-
-		statusBar = rootWidget.Add<Panel>()
-			.SetSkin(Computer.Instance.StatusBarSkin)
-			.SetSize(Core.ScreenSize.X, 12);
-
-		(statusLabel = statusBar.Add<Label>())
-			.SetVerticalAlign(Vertical.Center)
-			.SetPosition(4f, 0f)
-			.SetSize(Core.ScreenSize.X / 2, 12)
-		;
-
-		(debugLabel = statusBar.Add<Label>())
-			.SetHorizontalAlign(Horizontal.Right)
-			.SetVerticalAlign(Vertical.Center)
-			.SetPosition(Core.ScreenSize.X / 2, 0f)
-			.SetSize(Core.ScreenSize.X / 2 - 4, 12)
-		;
-
 		desktop = rootWidget.Add<Widget>()
 			.SetPosition(0f, 12f)
 			.SetSize(Core.ScreenSize.X, Core.ScreenSize.Y - 12);
 
-		SpawnWindow<Mine>();
-		//desktop.Add<Mine>().SetPosition(300f, 200f);
-		//desktop.Add<Vault>().SetPosition(500f, 180f);
-		////desktop.Add<Vault>().SetPosition(510f, 190f);
-		//desktop.Add<Vault>().SetPosition(520f, 200f);
+		Computer.Init(desktop, diskMax: 1024, memMax: 512, coinMax: 512);
 
-		//desktop.Add<Malware>().SetPosition(510f, 190f);
+		statusBar = rootWidget.Add<Panel>()
+			.SetSkin(Computer.StatusBarSkin)
+			.SetSize(Core.ScreenSize.X, 16);
 
+		(debugLabel = statusBar.Add<TextLabel>())
+			.SetHorizontalAlign(Horizontal.Right)
+			.SetVerticalAlign(Vertical.Center)
+			.SetPosition(Core.ScreenSize.X / 2, 2f)
+			.SetSize(Core.ScreenSize.X / 2 - 4, 12)
+		;
+
+		var diskBar = new Bar(Computer.Disk);
+		diskBar
+			.SetPosition(4f, 2f)
+			.SetSize(56, 12)
+		;
+		statusBar.Add(diskBar); // TODO need to call it before adding the label to have the skin working...
+		diskBar.Add<TextLabel>()
+			.SetText("DISK")
+			.Center()
+		;
+
+		var memBar = new Bar(Computer.Mem);
+		memBar.Inverse = true;
+		memBar
+			.SetPosition(66f, 2f)
+			.SetSize(60, 12)
+		;
+		statusBar.Add(memBar); // TODO need to call it before adding the label to have the skin working...
+		memBar.Add<ValueLabel>()
+			.SetFormat("MEM {2}Kb")
+			.SetValue(Computer.Mem)
+			.Center()
+		;
+
+		statusBar.Add<ValueLabel>()
+			.SetFormat("COIN {0}/{1}")
+			.SetValue(Computer.Coin)
+			.SetVerticalAlign(Vertical.Center)
+			.SetPosition(140, 2f)
+			.SetSize(56, 12)
+		;
+
+		Computer.CreateWindow(WindowData.Mine);
+
+		//barValue = new IntValue(0, 1000);
+
+		//var bar = new Bar(barValue);
+		//bar.Size = new Point(64, 12);
+		//bar.Position = new Vector2(120f, 80f);
+		//bar.BackgroundPatch = new NinePatch(Asset.SkinTexture, new Point(26, 22), 2);
+		//bar.FramePatch = new NinePatch(Asset.SkinTexture, new Point(32, 22), 2);
+		//bar.Add<ValueLabel>().SetValue(barValue).Center().SetSkin(Computer.PlayerSkin);
+		//desktop.Add(bar);
 		//var w = desktop.Add<Window>().SetTitle("Enemy!");
 		//w.Draggable = false;
 		//w.AlwaysOnTop = true;
@@ -85,40 +113,30 @@ class GameScene : Scene
 		//;
 	}
 
-	private void SpawnWindow<T>() where T : Window
-	{
-		var window = Activator.CreateInstance(typeof(T)) as T;
-		desktop.Add(window);
-		window.SetPosition(window.GetRandomPosition());
-	}
-
 	public override void Update()
 	{
 		base.Update();
 
+		//barValue.Add(1);
+
 		if (Input.WasKeyPressed(Keys.D1))
 		{
-			SpawnWindow<Mine>();
+			Computer.CreateWindow(WindowData.Mine);
 		}
 
 		if (Input.WasKeyPressed(Keys.D2))
 		{
-			SpawnWindow<Vault>();
+			Computer.CreateWindow(WindowData.Vault);
 		}
 
 		if (Input.WasKeyPressed(Keys.D3))
 		{
-			SpawnWindow<Malware>();
+			Computer.CreateWindow(WindowData.Malware);
 		}
 
-		if (Input.WasKeyPressed(Keys.D0))
+		if (Input.WasKeyPressed(Keys.D4))
 		{
-			for (var i = 0; i < 50; i++)
-			{
-				SpawnWindow<Mine>();
-				SpawnWindow<Vault>();
-				SpawnWindow<Malware>();
-			}
+			Computer.CreateWindow(WindowData.Shop);
 		}
 
 		rootWidget.Update();
@@ -174,18 +192,14 @@ class GameScene : Scene
 	{
 		base.Draw(spriteBatch);
 
-		statusLabel.Text = string.Format("DSK {0}/{1} - MEM 10/1024 - CPU {2}/{3} - coin {4}",
-			Computer.Instance.Disk, Computer.Instance.DiskMax,
-			Computer.Instance.Cpu, Computer.Instance.CpuMax,
-			Computer.Coin
-		);
+		//debugLabel.Text = string.Format("{0},{1} WND={2} FPS={3:0.00}",
+		//	Input.MousePosition.X,
+		//	Input.MousePosition.Y,
+		//	desktop.Children.Count,
+		//	Time.FPS
+		//);
 
-		debugLabel.Text = string.Format("{0},{1} WND={2} FPS={3:0.00}",
-			Input.MousePosition.X,
-			Input.MousePosition.Y,
-			desktop.Children.Count,
-			Time.FPS
-		);
+		debugLabel.Text = string.Format("{0},{1}", Input.MousePosition.X, Input.MousePosition.Y);
 
 		rootWidget.Draw(spriteBatch);
 

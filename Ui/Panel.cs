@@ -6,7 +6,7 @@ class Panel : Widget
 	{
 		if (Skin.Patch != null)
 		{
-			Skin.Patch.Draw(spriteBatch, ScreenPosition, Size);
+			spriteBatch.Draw(Skin.Patch, ScreenPosition, Size, Color);
 		}
 
 		base.Draw(spriteBatch);

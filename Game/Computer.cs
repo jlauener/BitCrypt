@@ -1,59 +1,52 @@
 ﻿using Microsoft.Xna.Framework;
+using System;
 
-class Computer
+static class Computer
 {
-	public static Computer Instance { get; set; }
+	public static Color DesktopColor { get; set; }
+	public static Skin StatusBarSkin { get; set; }
 
-	public Color DesktopColor { get; set; }
-	public Skin StatusBarSkin { get; set; }
-	public Skin PlayerSkin { get; set; }
-	public Skin EnemySkin { get; set; } // TODO should be somewhere else, EnemyData ?
-
-	public int Disk { get; private set; }
-	public int DiskMax { get; private set; }
-
-	public int Cpu { get; private set; }
-	public int CpuMax { get; private set; }
-
+	public static IntValue Disk { get; private set; }
+	public static IntValue Mem { get; private set; }
 	public static IntValue Coin { get; private set; }
 
-	public Computer(int diskMax, int cpuMax, int coinMax)
+	private static Widget desktop;
+
+	public static void Init(Widget desktop, int diskMax, int memMax, int coinMax)
 	{
-		DiskMax = diskMax;
-		CpuMax = cpuMax;
-		Coin = new IntValue(coinMax, coinMax);
+		Computer.desktop = desktop;
+
+		Disk = new IntValue(diskMax, diskMax);
+		Mem = new IntValue(0, memMax);
+		Coin = new IntValue(0, coinMax);
 
 		DesktopColor = new Color(0x00, 0x00, 0x12);
 
 		StatusBarSkin = new Skin
 		{
 			Font = Asset.DefaultFont,
-			Color = Color.Black,
+			TextColor = Color.Black,
 			Patch = new NinePatch(Asset.SkinTexture, new Point(52, 0), 4),
+			BarBackgroundPatch = new NinePatch(Asset.SkinTexture, new Point(52, 12), 2),
+			BarFramePatch = new NinePatch(Asset.SkinTexture, new Point(58, 12), 2),
 		};
+	}
 
-		PlayerSkin = new Skin
-		{
-			Font = Asset.DefaultFont,
-			Color = Color.White,
-			WindowTitleFont = Asset.DefaultFont,
-			WindowTitleTextColor = Color.Black,
-			WindowTitlePatch = new SixPatch(Asset.SkinTexture, new Point(0, 8), 4),
-			WindowFramePatch = new NinePatch(Asset.SkinTexture, new Point(0, 16), 4),
-			ButtonReleasedPatch = new NinePatch(Asset.SkinTexture, new Point(12, 8), 4),
-			ButtonPressedPatch = new NinePatch(Asset.SkinTexture, new Point(12, 20), 4),
-		};
+	public static bool CanCreateWindow(WindowData windowData)
+	{
+		return windowData.Mem < Mem.Free;
+	}
 
-		EnemySkin = new Skin
-		{
-			Font = Asset.DefaultFont,
-			Color = Color.White,
-			WindowTitleFont = Asset.DefaultFont,
-			WindowTitleTextColor = Color.Black,
-			WindowTitlePatch = new SixPatch(Asset.SkinTexture, new Point(0, 32), 4),
-			WindowFramePatch = new NinePatch(Asset.SkinTexture, new Point(0, 40), 4),
-			ButtonReleasedPatch = new NinePatch(Asset.SkinTexture, new Point(12, 32), 4),
-			ButtonPressedPatch = new NinePatch(Asset.SkinTexture, new Point(12, 44), 4),
-		};
+	public static bool CreateWindow(WindowData windowData)
+	{
+		if (!CanCreateWindow(windowData)) return false;
+
+		Mem.Add(windowData.Mem);
+		var window = Activator.CreateInstance(windowData.WindowClass) as Window;
+		window.SetSkin(windowData.Skin);
+		window.OnRemovedEvent += () => Mem.Remove(windowData.Mem);
+		desktop.Add(window);
+		window.SetPosition(window.GetRandomPosition());
+		return true;
 	}
 }

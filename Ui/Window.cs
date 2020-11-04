@@ -116,8 +116,8 @@ class Window : Widget
 
 	public override void Draw(SpriteBatch spriteBatch)
 	{
-		spriteBatch.Draw(Skin.WindowTitlePatch, ScreenPosition, new Point(Size.X, 8));
-		spriteBatch.Draw(Skin.WindowFramePatch, ScreenPosition + new Vector2(0f, 8f), new Point(Size.X, Size.Y - 8));
+		spriteBatch.Draw(Skin.WindowTitlePatch, ScreenPosition, new Point(Size.X, 8), Color);
+		spriteBatch.Draw(Skin.WindowFramePatch, ScreenPosition + new Vector2(0f, 8f), new Point(Size.X, Size.Y - 8), Color);
 
 		spriteBatch.DrawText(Skin.WindowTitleFont, ScreenPosition + new Vector2(4f, 2f), Title, Skin.WindowTitleTextColor);
 

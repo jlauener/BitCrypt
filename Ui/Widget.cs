@@ -5,18 +5,29 @@ using System.Collections.Generic;
 
 class Widget
 {
+	public event Action OnRemovedEvent;
+
 	public Widget Parent { get; set; }
 
 	private Skin skin;
 	public Skin Skin
 	{
-		get { return skin != null ? skin : Parent.Skin; }
-		set { skin = value; }
+		get => skin != null ? skin : (Parent != null ? Parent.Skin : null);
+		set
+		{
+			skin = value;
+			if (skin != null) ApplySkin();
+		}
 	}
+
 	public Widget SetSkin(Skin skin)
 	{
 		Skin = skin;
 		return this;
+	}
+
+	protected virtual void ApplySkin()
+	{
 	}
 
 	public Vector2 Position { get; set; }
@@ -29,7 +40,7 @@ class Widget
 	{
 		return SetPosition(new Vector2(x, y));
 	}
-	
+
 	public Vector2 Offset { get; set; }
 	public Widget SetOffset(Vector2 offset)
 	{
@@ -44,8 +55,8 @@ class Widget
 	private Point? size;
 	public Point Size
 	{
-		get { return size.HasValue ? size.Value : Parent.Size; }
-		set { size = value; }
+		get => size.HasValue ? size.Value : Parent.Size;
+		set => size = value;
 	}
 	public Widget SetSize(Point size)
 	{
@@ -55,6 +66,14 @@ class Widget
 	public Widget SetSize(int w, int h)
 	{
 		return SetSize(new Point(w, h));
+	}
+
+	public Color Color { get; set; } = Color.White;
+
+	public Widget SetColor(Color color)
+	{
+		Color = color;
+		return this;
 	}
 
 	public bool AlwaysOnTop { get; set; }
@@ -70,7 +89,7 @@ class Widget
 	private bool isMouseOver;
 	public bool IsMouseOver
 	{
-		get { return isMouseOver; }
+		get => isMouseOver;
 		set
 		{
 			if (!isMouseOver && value)
@@ -134,6 +153,8 @@ class Widget
 		Children.Remove(child);
 		child.Parent = null;
 		child.OnRemoved();
+
+		OnRemovedEvent?.Invoke();
 	}
 
 	public void BringToFront()
@@ -192,6 +213,10 @@ class Widget
 	// TODO On added should be called after all sets method are called. Call it before first active frame.
 	public virtual void OnAdded()
 	{
+		if (skin == null && Parent.Skin != null)
+		{
+			ApplySkin();
+		}
 	}
 
 	public virtual void OnRemoved()

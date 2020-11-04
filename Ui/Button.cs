@@ -42,11 +42,11 @@ class Button : Widget
 	{
 		if (pressed)
 		{
-			Skin.ButtonPressedPatch.Draw(spriteBatch, ScreenPosition, Size);
+			spriteBatch.Draw(Skin.ButtonPressedPatch, ScreenPosition, Size, Color);
 		}
 		else
 		{
-			Skin.ButtonReleasedPatch.Draw(spriteBatch, ScreenPosition, Size);
+			spriteBatch.Draw(Skin.ButtonReleasedPatch, ScreenPosition, Size, Color);
 		}
 
 		base.Draw(spriteBatch);
