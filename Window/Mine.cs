@@ -16,8 +16,8 @@ class Mine : Window
 	private int upgradeCost = 256;
 
 	private readonly TextLabel coinPerSecLabel;
-	private readonly Button transferButton;
-	private readonly Button upgradeButton;
+	private readonly Button transferButton; // TODO make it blink/flash/text bounce when full?
+	private readonly BuyButton upgradeButton;
 
 	public Mine()
 	{
@@ -28,14 +28,13 @@ class Mine : Window
 			.SetSize(88, 8)
 		;
 
-		var coinBar = new Bar(Coin) // TODO cannot add directly because of Bar's OnAdded relying on Parent's size..
-			.SetSize(88, 12)
-		;
-		Add(coinBar) // TODO need to call it before adding the label to have the skin working...
-			.Add<ValueLabel>()
-			.SetFormat("coin ({0}/{1})")
+		Add<Bar>()
 			.SetValue(Coin)
-			.Center()
+			.SetSize(88, 12)
+			.Add<ValueLabel>()
+				.SetFormat("coin ({0}/{1})")
+				.SetValue(Coin)
+				.Center()
 		;
 
 		(transferButton = Add<Button>())
@@ -44,7 +43,8 @@ class Mine : Window
 			.Add<TextLabel>().SetText("transfer").Center();
 		;
 
-		(upgradeButton = Add<Button>())
+		(upgradeButton = Add<BuyButton>())
+			.SetCost(upgradeCost)
 			.SetOnPressed(Upgrade)
 			.SetSize(88, 12)
 			.Add<TextLabel>().SetText(UPGRADE_FORMAT, upgradeCost).Center();
@@ -66,8 +66,18 @@ class Mine : Window
 		}
 
 		var labelColor = Coin.Value == Coin.Max ? Color.Red : Skin.TextColor;
-		transferButton.Get<Label>().Color = labelColor;
+
 		coinPerSecLabel.Color = labelColor;
+		if (Coin.Value == Coin.Max)
+		{
+			coinPerSecLabel.Color = new Color(0xBE, 0x26, 0x33);
+			coinPerSecLabel.SetText(COIN_PER_SEC_FORMAT, 0);
+		}
+		else
+		{
+			coinPerSecLabel.Color = Skin.TextColor;
+			coinPerSecLabel.SetText(COIN_PER_SEC_FORMAT, CoinPerSec);
+		}
 	}
 
 	private void Upgrade()
@@ -82,6 +92,7 @@ class Mine : Window
 			coinPerSecLabel.SetText(COIN_PER_SEC_FORMAT, CoinPerSec);
 
 			upgradeCost *= 2;
+			upgradeButton.SetCost(upgradeCost);
 			upgradeButton.Get<TextLabel>().SetText(UPGRADE_FORMAT, upgradeCost);
 		}
 	}

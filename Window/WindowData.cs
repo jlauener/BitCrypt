@@ -12,42 +12,45 @@ class WindowData
 	{
 		Font = Asset.DefaultFont,
 		TextColor = Color.White,
+		DisabledColor = new Color(0x9D, 0x9D, 0x9D),
 		WindowTitleFont = Asset.DefaultFont,
 		WindowTitleTextColor = Color.Black,
-		WindowTitlePatch = new SixPatch(Asset.SkinTexture, new Point(0, 8), 4),
-		WindowFramePatch = new NinePatch(Asset.SkinTexture, new Point(0, 16), 4),
-		ButtonReleasedPatch = new NinePatch(Asset.SkinTexture, new Point(12, 8), 4),
-		ButtonPressedPatch = new NinePatch(Asset.SkinTexture, new Point(12, 20), 4),
-		BarBackgroundPatch = new NinePatch(Asset.SkinTexture, new Point(24, 8), 2),
-		BarFramePatch = new NinePatch(Asset.SkinTexture, new Point(24, 14), 2),
+		WindowTitlePatch = new SixPatch(Asset.DefaultTexture, new Point(0, 8), 4),
+		WindowFramePatch = new NinePatch(Asset.DefaultTexture, new Point(0, 16), 4),
+		ButtonReleasedPatch = new NinePatch(Asset.DefaultTexture, new Point(12, 8), 4),
+		ButtonPressedPatch = new NinePatch(Asset.DefaultTexture, new Point(12, 20), 4),
+		BarBackgroundPatch = new NinePatch(Asset.DefaultTexture, new Point(24, 8), 2),
+		BarFramePatch = new NinePatch(Asset.DefaultTexture, new Point(24, 14), 2),
 	};
 
 	public static Skin MalwareSkin = new Skin
 	{
 		Font = Asset.DefaultFont,
 		TextColor = Color.White,
+		DisabledColor = new Color(0x9D, 0x9D, 0x9D),
 		WindowTitleFont = Asset.DefaultFont,
 		WindowTitleTextColor = Color.Black,
-		WindowTitlePatch = new SixPatch(Asset.SkinTexture, new Point(0, 32), 4),
-		WindowFramePatch = new NinePatch(Asset.SkinTexture, new Point(0, 40), 4),
-		ButtonReleasedPatch = new NinePatch(Asset.SkinTexture, new Point(12, 32), 4),
-		ButtonPressedPatch = new NinePatch(Asset.SkinTexture, new Point(12, 44), 4),
-		BarBackgroundPatch = new NinePatch(Asset.SkinTexture, new Point(24, 32), 2),
-		BarFramePatch = new NinePatch(Asset.SkinTexture, new Point(24, 38), 2),
+		WindowTitlePatch = new SixPatch(Asset.DefaultTexture, new Point(0, 32), 4),
+		WindowFramePatch = new NinePatch(Asset.DefaultTexture, new Point(0, 40), 4),
+		ButtonReleasedPatch = new NinePatch(Asset.DefaultTexture, new Point(12, 32), 4),
+		ButtonPressedPatch = new NinePatch(Asset.DefaultTexture, new Point(12, 44), 4),
+		BarBackgroundPatch = new NinePatch(Asset.DefaultTexture, new Point(24, 32), 2),
+		BarFramePatch = new NinePatch(Asset.DefaultTexture, new Point(24, 38), 2),
 	};
 
 	public static Skin ShopSkin = new Skin
 	{
 		Font = Asset.DefaultFont,
 		TextColor = Color.White,
+		DisabledColor = new Color(0x9D, 0x9D, 0x9D),
 		WindowTitleFont = Asset.DefaultFont,
 		WindowTitleTextColor = Color.Black,
-		WindowTitlePatch = new SixPatch(Asset.SkinTexture, new Point(32, 32), 4),
-		WindowFramePatch = new NinePatch(Asset.SkinTexture, new Point(32, 40), 4),
-		ButtonReleasedPatch = new NinePatch(Asset.SkinTexture, new Point(44, 32), 4),
-		ButtonPressedPatch = new NinePatch(Asset.SkinTexture, new Point(44, 44), 4),
-		BarBackgroundPatch = new NinePatch(Asset.SkinTexture, new Point(56, 32), 2),
-		BarFramePatch = new NinePatch(Asset.SkinTexture, new Point(56, 38), 2),
+		WindowTitlePatch = new SixPatch(Asset.DefaultTexture, new Point(32, 32), 4),
+		WindowFramePatch = new NinePatch(Asset.DefaultTexture, new Point(32, 40), 4),
+		ButtonReleasedPatch = new NinePatch(Asset.DefaultTexture, new Point(44, 32), 4),
+		ButtonPressedPatch = new NinePatch(Asset.DefaultTexture, new Point(44, 44), 4),
+		BarBackgroundPatch = new NinePatch(Asset.DefaultTexture, new Point(56, 32), 2),
+		BarFramePatch = new NinePatch(Asset.DefaultTexture, new Point(56, 38), 2),
 	};
 
 	public static readonly WindowData Mine = new WindowData

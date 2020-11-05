@@ -6,6 +6,7 @@ class Skin
 	public Texture2D Texture { get; set; }
 	public BitmapFont Font { get; set; }
 	public Color TextColor { get; set; }
+	public Color DisabledColor { get; set; }
 	public Patch Patch { get; set; }
 	public Patch WindowFramePatch { get; set; }
 	public Patch WindowTitlePatch { get; set; }

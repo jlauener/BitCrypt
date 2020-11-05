@@ -1,8 +1,8 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System;
-using System.Security.Cryptography.X509Certificates;
 
+// TODO window error state (blink title red?)
 class Window : Widget
 {
 	public string Title { get; set; }
@@ -116,8 +116,8 @@ class Window : Widget
 
 	public override void Draw(SpriteBatch spriteBatch)
 	{
-		spriteBatch.Draw(Skin.WindowTitlePatch, ScreenPosition, new Point(Size.X, 8), Color);
-		spriteBatch.Draw(Skin.WindowFramePatch, ScreenPosition + new Vector2(0f, 8f), new Point(Size.X, Size.Y - 8), Color);
+		spriteBatch.DrawPatch(Skin.WindowTitlePatch, ScreenPosition, new Point(Size.X, 8), Color);
+		spriteBatch.DrawPatch(Skin.WindowFramePatch, ScreenPosition + new Vector2(0f, 8f), new Point(Size.X, Size.Y - 8), Color);
 
 		spriteBatch.DrawText(Skin.WindowTitleFont, ScreenPosition + new Vector2(4f, 2f), Title, Skin.WindowTitleTextColor);
 

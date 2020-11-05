@@ -20,6 +20,8 @@ class Core : Game
 	private Rectangle fullscreenBounds;
 
 	private Scene scene;
+
+	private bool debug;
 	
 	public Core()
 	{
@@ -84,6 +86,11 @@ class Core : Game
 			graphics.ApplyChanges();
 		}
 
+		if (Input.IsKeyDown(Keys.LeftShift) && Input.WasKeyPressed(Keys.OemTilde))
+		{
+			debug = !debug;
+		}
+
 		scene.Update();
 	}
 
@@ -96,6 +103,7 @@ class Core : Game
 
 		spriteBatch.Begin(samplerState : SamplerState.PointClamp);
 		scene.Draw(spriteBatch);
+		if (debug) scene.DrawDebug(spriteBatch);
 		spriteBatch.End();
 
 		GraphicsDevice.SetRenderTarget(null);

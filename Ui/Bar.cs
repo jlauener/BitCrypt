@@ -4,17 +4,37 @@ using Microsoft.Xna.Framework.Graphics;
 // TODO support other bar orientation (needed?)
 class Bar : Widget
 {
-	public IntValue Value { get; }
-	private Rectangle cutOut;
+	private IntValue value;
+	public IntValue Value
+	{
+		get => value;
+		set
+		{
+			if (this.value != value)
+			{
+				if (this.value != null) this.value.OnChanged -= HandleValueChanged;
+				value.OnChanged += HandleValueChanged;
+				this.value = value;
+			}
+		}
+	}
 
-	public bool Inverse;
-
-	private Point barSize;
-
-	public Bar(IntValue value)
+	public Bar SetValue(IntValue value)
 	{
 		Value = value;
+		return this;
 	}
+
+	public bool Inverse { get; set; }
+
+	public Bar SetInverse(bool inverse)
+	{
+		Inverse = inverse;
+		return this;
+	}
+
+	private Rectangle cutOut;
+	private Point barSize;
 
 	public override void OnAdded()
 	{
@@ -23,13 +43,25 @@ class Bar : Widget
 		barSize = Size;
 		barSize.X -= 4;
 		barSize.Y -= 4;
+		HandleValueChanged(IntValueChangedEvent.Init);
 	}
 
-	public override void Update()
+	public override void OnRemoved()
 	{
-		base.Update();
-		// FIXME should react to value change...
+		base.OnRemoved();
+		value.OnChanged -= HandleValueChanged;
+	}
 
+	public override void Draw(SpriteBatch spriteBatch)
+	{
+		spriteBatch.DrawPatch(Skin.BarBackgroundPatch, ScreenPosition, Size, Color);
+		spriteBatch.DrawPatch(Skin.BarFramePatch, ScreenPosition + new Vector2(2f, 2f), barSize, Color, cutOut);
+
+		base.Draw(spriteBatch);
+	}
+
+	private void HandleValueChanged(IntValueChangedEvent evt)
+	{
 		var pct = Value.Value / ((float)Value.Max);
 		if (Inverse)
 		{
@@ -38,13 +70,5 @@ class Bar : Widget
 
 		cutOut.Width = (int)(pct * barSize.X);
 		cutOut.Height = barSize.Y;
-	}
-
-	public override void Draw(SpriteBatch spriteBatch)
-	{
-		spriteBatch.Draw(Skin.BarBackgroundPatch, ScreenPosition, Size, Color);
-		spriteBatch.Draw(Skin.BarFramePatch, ScreenPosition + new Vector2(2f, 2f), barSize, Color, cutOut);
-
-		base.Draw(spriteBatch);
 	}
 }

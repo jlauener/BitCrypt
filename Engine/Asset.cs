@@ -4,14 +4,14 @@ using System.Collections.Generic;
 // TODO Remove the default stuffs?
 static class Asset
 {
-	public static Texture2D SkinTexture;
+	public static Texture2D DefaultTexture;
 	public static BitmapFont DefaultFont;
 
 	private static readonly Dictionary<string, object> store = new Dictionary<string, object>();
 
 	public static void Init()
 	{
-		SkinTexture = LoadTexture2D("gfx/skin.png");
+		DefaultTexture = LoadTexture2D("gfx/skin.png");
 		DefaultFont = LoadBitmapFont("font/04b03.fnt");
 	}
 
@@ -49,12 +49,6 @@ static class Asset
 
 		result = null;
 		return false;
-	}
-
-	private static T AddAsset<T>(string path, T asset) where T : class
-	{
-		store[path] = asset;
-		return asset;
 	}
 
 	private static string GetAssetPath(string path)

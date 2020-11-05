@@ -26,9 +26,9 @@ static class Computer
 		{
 			Font = Asset.DefaultFont,
 			TextColor = Color.Black,
-			Patch = new NinePatch(Asset.SkinTexture, new Point(52, 0), 4),
-			BarBackgroundPatch = new NinePatch(Asset.SkinTexture, new Point(52, 12), 2),
-			BarFramePatch = new NinePatch(Asset.SkinTexture, new Point(58, 12), 2),
+			Patch = new NinePatch(Asset.DefaultTexture, new Point(52, 0), 4),
+			BarBackgroundPatch = new NinePatch(Asset.DefaultTexture, new Point(52, 12), 2),
+			BarFramePatch = new NinePatch(Asset.DefaultTexture, new Point(58, 12), 2),
 		};
 	}
 

@@ -25,28 +25,36 @@ class Button : Widget
 	{
 		base.OnMousePressed();
 
-		pressed = true;
-		Children.ForEach((child) => child.Offset = new Vector2(1f, 1f));
+		if (Enabled)
+		{
+			pressed = true;
+			Children.ForEach((child) => child.Offset = new Vector2(1f, 1f));
+		}
+
+		// TODO what if button is disabled/enabled while pressed?
 	}
 
 	public override void OnMouseReleased()
 	{
 		base.OnMouseReleased();
 
-		OnPressed?.Invoke();
-		pressed = false;
-		Children.ForEach((child) => child.Offset = Vector2.Zero);
+		if (Enabled)
+		{
+			OnPressed?.Invoke();
+			pressed = false;
+			Children.ForEach((child) => child.Offset = Vector2.Zero);
+		}
 	}
 
 	public override void Draw(SpriteBatch spriteBatch)
 	{
 		if (pressed)
 		{
-			spriteBatch.Draw(Skin.ButtonPressedPatch, ScreenPosition, Size, Color);
+			spriteBatch.DrawPatch(Skin.ButtonPressedPatch, ScreenPosition, Size, Enabled ? Color : Skin.DisabledColor);
 		}
 		else
 		{
-			spriteBatch.Draw(Skin.ButtonReleasedPatch, ScreenPosition, Size, Color);
+			spriteBatch.DrawPatch(Skin.ButtonReleasedPatch, ScreenPosition, Size, Enabled ? Color : Skin.DisabledColor);
 		}
 
 		base.Draw(spriteBatch);

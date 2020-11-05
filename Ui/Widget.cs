@@ -76,6 +76,14 @@ class Widget
 		return this;
 	}
 
+	public bool Enabled { get; set; } = true;
+
+	public Widget SetEnabled(bool enabled)
+	{
+		Enabled = enabled;
+		return this;
+	}
+
 	public bool AlwaysOnTop { get; set; }
 
 	// TODO Optimize ScreenPosition calculation. Maybe add a dirty flag? Something like repaint !
@@ -105,9 +113,12 @@ class Widget
 		}
 	}
 
+	private bool added;
+
 	public T Add<T>(T child) where T : Widget
 	{
 		child.Parent = this;
+		if (Skin != null) child.Skin = Skin;
 
 		var targetIndex = 0;
 		for (var i = 0; i < Children.Count; i++)
@@ -120,7 +131,6 @@ class Widget
 		}
 
 		Children.Insert(targetIndex, child);
-		child.OnAdded(); // TODO must be called after all sets call, or call add a the end.. but not convenient?
 		return child;
 	}
 
@@ -210,10 +220,9 @@ class Widget
 		return true;
 	}
 
-	// TODO On added should be called after all sets method are called. Call it before first active frame.
 	public virtual void OnAdded()
 	{
-		if (skin == null && Parent.Skin != null)
+		if (skin == null && Parent != null && Parent.Skin != null)
 		{
 			ApplySkin();
 		}
@@ -246,8 +255,15 @@ class Widget
 		//Debug.WriteLine("{0} OnMouseReleased", this);
 	}
 
+	// TODO keep it like that, or have a system to register update? avoids going trough the full tree each frame. Worth it?
 	public virtual void Update()
 	{
+		if (!added)
+		{
+			OnAdded();
+			added = true;
+		}
+
 		Children.ForEach((child) =>
 		{
 			child.Update();
@@ -259,6 +275,15 @@ class Widget
 		for (var i = Children.Count - 1; i >= 0; i--)
 		{
 			Children.list[i].Draw(spriteBatch);
+		}
+	}
+
+	public virtual void DrawDebug(SpriteBatch spriteBatch)
+	{
+		spriteBatch.DrawRect(new Rectangle((int)ScreenPosition.X, (int)ScreenPosition.Y, Size.X, Size.Y), Color.Yellow);
+		for (var i = Children.Count - 1; i >= 0; i--)
+		{
+			Children.list[i].DrawDebug(spriteBatch);
 		}
 	}
 }

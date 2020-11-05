@@ -1,4 +1,5 @@
-﻿using Microsoft.Xna.Framework;
+﻿using BitmapFontReader;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
 enum Horizontal
@@ -67,7 +68,7 @@ abstract class Label : Widget
 					break;
 			}
 
-			spriteBatch.DrawText(Skin.Font, position, text, Color);
+			spriteBatch.DrawText(Skin.Font, position, text, Enabled ? Color : Skin.DisabledColor);
 		}
 	}
 
@@ -88,7 +89,10 @@ class TextLabel : Label
 	public string Text
 	{
 		get => text;
-		set => text = value;
+		set
+		{
+			text = value;
+		}
 	}
 
 	public TextLabel SetText(string text)
@@ -100,6 +104,12 @@ class TextLabel : Label
 	public TextLabel SetText(string format, params object[] args)
 	{
 		return SetText(string.Format(format, args));
+	}
+
+	public TextLabel Pack()
+	{
+		Size = Skin.Font.GetSize(Text);
+		return this;
 	}
 }
 
@@ -115,7 +125,6 @@ class ValueLabel : Label
 			{
 				if (this.value != null) this.value.OnChanged -= HandleValueChanged;
 				value.OnChanged += HandleValueChanged;
-				text = string.Format(Format, value.Value, value.Max, value.Free);
 				this.value = value;
 			}
 		}
@@ -133,6 +142,12 @@ class ValueLabel : Label
 	{
 		Format = format;
 		return this;
+	}
+
+	public override void OnAdded()
+	{
+		base.OnAdded();
+		HandleValueChanged(IntValueChangedEvent.Init);
 	}
 
 	public override void OnRemoved()

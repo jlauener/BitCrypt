@@ -13,4 +13,8 @@ class Scene
 	public virtual void Draw(SpriteBatch spriteBatch)
 	{
 	}
+
+	public virtual void DrawDebug(SpriteBatch spriteBatch)
+	{
+	}
 }

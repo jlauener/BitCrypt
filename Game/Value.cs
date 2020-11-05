@@ -2,6 +2,8 @@
 
 public struct IntValueChangedEvent
 {
+	public static readonly IntValueChangedEvent Init;
+
 	public int Delta { get; set; }
 	public int MaxDelta { get; set; }
 }

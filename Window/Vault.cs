@@ -5,7 +5,7 @@
 	private const string UPGRADE_FORMAT = "Upgrade ({0})";
 
 	private readonly TextLabel label;
-	private readonly Button upgradeButton;
+	private readonly BuyButton upgradeButton;
 
 	private int upgradeCost = 128;
 	private int coinModifier = 256;
@@ -20,7 +20,8 @@
 			.SetSize(88, 8)
 		;
 
-		(upgradeButton = Add<Button>())
+		(upgradeButton = Add<BuyButton>())
+			.SetCost(upgradeCost)
 			.SetSize(88, 12)
 			.Add<TextLabel>().SetText(UPGRADE_FORMAT, upgradeCost).Center();
 		;
@@ -39,6 +40,7 @@
 				label.SetText(LABEL_FORMAT, coinModifier);
 
 				upgradeCost *= 2;
+				upgradeButton.SetCost(upgradeCost);
 				upgradeButton.Get<TextLabel>().SetText(UPGRADE_FORMAT, upgradeCost);
 			}
 		};

@@ -1,20 +1,10 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
-using System.Collections.Generic;
-
-// TODO improve handling of mouse pressed/released event
-// should be able to keep the mouse down, go out of the widget -> mouse released
-// then, while keeping the button down, go back on the widget -> mouse pressed
-// --> even more critical with enemies!!!
 
 // TODO mouse cursor (maybe sprite class simply?)
 class GameScene : Scene
 {
-	private readonly List<Widget> overedWidgets = new List<Widget>();
-	private readonly List<Widget> nextOveredWidgets = new List<Widget>();
-	private readonly HashSet<Widget> mousePressedWidgets = new HashSet<Widget>();
-
 	private Widget rootWidget;
 	private Widget statusBar;
 	private Widget desktop;
@@ -30,7 +20,7 @@ class GameScene : Scene
 
 		Core.BackgroundColor = Computer.DesktopColor;
 
-		rootWidget = new Widget().SetSize(Core.ScreenSize);
+		rootWidget = new RootWidget().SetSize(Core.ScreenSize);
 		desktop = rootWidget.Add<Widget>()
 			.SetPosition(0f, 12f)
 			.SetSize(Core.ScreenSize.X, Core.ScreenSize.Y - 12);
@@ -48,28 +38,24 @@ class GameScene : Scene
 			.SetSize(Core.ScreenSize.X / 2 - 4, 12)
 		;
 
-		var diskBar = new Bar(Computer.Disk);
-		diskBar
+		statusBar.Add<Bar>()
+			.SetValue(Computer.Disk)
 			.SetPosition(4f, 2f)
 			.SetSize(56, 12)
-		;
-		statusBar.Add(diskBar); // TODO need to call it before adding the label to have the skin working...
-		diskBar.Add<TextLabel>()
-			.SetText("DISK")
-			.Center()
+			.Add<TextLabel>()
+				.SetText("DISK")
+				.Center()
 		;
 
-		var memBar = new Bar(Computer.Mem);
-		memBar.Inverse = true;
-		memBar
-			.SetPosition(66f, 2f)
-			.SetSize(60, 12)
-		;
-		statusBar.Add(memBar); // TODO need to call it before adding the label to have the skin working...
-		memBar.Add<ValueLabel>()
-			.SetFormat("MEM {2}Kb")
+		statusBar.Add<Bar>()
 			.SetValue(Computer.Mem)
-			.Center()
+			.SetInverse(true)
+			.SetPosition(66f, 2f)
+			.SetSize(60, 12)		
+			.Add<ValueLabel>()
+				.SetFormat("MEM {2}Kb")
+				.SetValue(Computer.Mem)
+				.Center()
 		;
 
 		statusBar.Add<ValueLabel>()
@@ -80,7 +66,29 @@ class GameScene : Scene
 			.SetSize(56, 12)
 		;
 
-		Computer.CreateWindow(WindowData.Mine);
+		//Computer.CreateWindow(WindowData.Mine);
+
+		//var layout = desktop.Add<Layout>();
+		//layout.SetSkin(WindowData.ShopSkin).SetPosition(40, 80);
+		//layout.Background = WindowData.ShopSkin.WindowFramePatch;
+
+		//var topLayout = layout.Add<Layout>();
+		////vLayout.Background = WindowData.PlayerSkin.WindowFramePatch;
+		//topLayout.Add<Image>().SetSprite(new Sprite(Asset.DefaultTexture, new Rectangle(4, 64, 28, 28)));
+		//topLayout.Add<TextLabel>().SetText("Hello! Welcome to the\nminer's paradise!").Pack();
+		//topLayout.PackHorizontally();
+
+
+		//var hLayout = layout.Add<Layout>();
+		////hLayout.Background = WindowData.PlayerSkin.WindowFramePatch;
+		//hLayout.Add<Button>().SetSize(32, 32);
+		//hLayout.Add<Button>().SetSize(32, 32);
+		//hLayout.Add<Button>().SetSize(32, 32);
+		//hLayout.PackHorizontally();
+
+		//layout.PackVertically();
+
+		//layout.Add<Panel>().SetSkin(WindowData.PlayerSkin);
 
 		//barValue = new IntValue(0, 1000);
 
@@ -117,8 +125,6 @@ class GameScene : Scene
 	{
 		base.Update();
 
-		//barValue.Add(1);
-
 		if (Input.WasKeyPressed(Keys.D1))
 		{
 			Computer.CreateWindow(WindowData.Mine);
@@ -140,47 +146,8 @@ class GameScene : Scene
 		}
 
 		rootWidget.Update();
-		rootWidget.Query(Input.MousePosition, nextOveredWidgets);
 
-		for (var i = overedWidgets.Count - 1; i >= 0; i--)
-		{
-			var w = overedWidgets[i];
-			if (!nextOveredWidgets.Contains(w))
-			{
-				w.IsMouseOver = false;
-				overedWidgets.RemoveAt(i);
-				mousePressedWidgets.Remove(w);
-			}
-		}
-
-		foreach (var w in nextOveredWidgets)
-		{
-			if (!overedWidgets.Contains(w))
-			{
-				w.IsMouseOver = true;
-				overedWidgets.Add(w);
-			}
-		}
-
-		nextOveredWidgets.Clear();
-
-		if (Input.WasMousePressed(MouseButton.Left))
-		{
-			foreach (var widget in overedWidgets)
-			{
-				widget.OnMousePressed();
-				mousePressedWidgets.Add(widget);
-			}
-		}
-
-		if (Input.WasMouseReleased(MouseButton.Left))
-		{
-			foreach (var w in mousePressedWidgets)
-			{
-				w.OnMouseReleased();
-			}
-			mousePressedWidgets.Clear();
-		}
+		debugLabel.Text = string.Format("{0},{1}", Input.MousePosition.X, Input.MousePosition.Y);
 
 		if ((Input.IsKeyDown(Keys.LeftShift) | Input.IsKeyDown(Keys.RightShift)) && Input.WasKeyPressed(Keys.R))
 		{
@@ -191,18 +158,15 @@ class GameScene : Scene
 	public override void Draw(SpriteBatch spriteBatch)
 	{
 		base.Draw(spriteBatch);
-
-		//debugLabel.Text = string.Format("{0},{1} WND={2} FPS={3:0.00}",
-		//	Input.MousePosition.X,
-		//	Input.MousePosition.Y,
-		//	desktop.Children.Count,
-		//	Time.FPS
-		//);
-
-		debugLabel.Text = string.Format("{0},{1}", Input.MousePosition.X, Input.MousePosition.Y);
-
 		rootWidget.Draw(spriteBatch);
+		spriteBatch.Draw(Asset.DefaultTexture, Input.MousePosition, new Rectangle(0, 0, 8, 8), Color.White);
+	}
 
-		spriteBatch.Draw(Asset.SkinTexture, Input.MousePosition, new Rectangle(0, 0, 8, 8), Color.White);
+	public override void DrawDebug(SpriteBatch spriteBatch)
+	{
+		base.DrawDebug(spriteBatch);
+		rootWidget.DrawDebug(spriteBatch);
+		// redraw the cursor to make sure it's over the debug overlay
+		spriteBatch.Draw(Asset.DefaultTexture, Input.MousePosition, new Rectangle(0, 0, 8, 8), Color.White);
 	}
 }

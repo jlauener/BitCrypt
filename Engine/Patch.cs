@@ -42,19 +42,6 @@ abstract class Patch
 	}
 }
 
-static class PatchExtensions
-{
-	public static void Draw(this SpriteBatch spriteBatch, Patch patch, Vector2 position, Point size, Color color)
-	{
-		patch.Draw(spriteBatch, position, size, color, null);
-	}
-
-	public static void Draw(this SpriteBatch spriteBatch, Patch patch, Vector2 position, Point size, Color color, Rectangle? cutRect)
-	{
-		patch.Draw(spriteBatch, position, size, color, cutRect);
-	}
-}
-
 class SixPatch : Patch
 {
 	public SixPatch(Texture2D texture, Point origin, int patchSize) : base(texture, origin, patchSize) { }

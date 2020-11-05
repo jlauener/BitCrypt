@@ -34,31 +34,51 @@ class BitmapFont
 
 	public Point GetSize(string text)
 	{
+		var currentWidth = 0;
 		var width = 0;
+		var height = 8;
 
 		for (var i = 0; i < text.Length; i++)
 		{
+			if (text[i] == '\n')
+			{
+				width = Math.Max(currentWidth, width);
+				currentWidth = 0;
+				height += 10; // TODO font height
+				continue;
+			}
+
 			if (charSet.TryGetValue(text[i], out var chr))
 			{
-				width += chr.XAdvance;
+				currentWidth += chr.XAdvance;
 			}
 			else
 			{
 				Console.WriteLine("ERROR Unknown character '" + text[i] + "' in string '" + text + "',");
 			}
 		}
+		width = Math.Max(currentWidth, width);
 
-		return new Point(width - 1, 8);
+		return new Point(width - 1, height);
 	}
 
 	public void Draw(SpriteBatch spriteBatch, Vector2 position, string text, Color color)
 	{
+		var currentPosition = position;
+
 		for (var i = 0; i < text.Length; i++)
 		{
+			if (text[i] == '\n')
+			{
+				currentPosition.Y += 10; // TODO font height
+				currentPosition.X = position.X;
+				continue;
+			}
+
 			if (charSet.TryGetValue(text[i], out var chr))
 			{
-				spriteBatch.Draw(texture, position + chr.Offset, chr.SourceRect, color);
-				position.X += chr.XAdvance;
+				spriteBatch.Draw(texture, currentPosition + chr.Offset, chr.SourceRect, color);
+				currentPosition.X += chr.XAdvance;
 			}
 			else
 			{
@@ -73,14 +93,6 @@ class BitmapFont
 		XmlSerializer serializer = new XmlSerializer(typeof(BitmapFontReader.Font));
 		FileStream stream = new FileStream(path, FileMode.Open);
 		return new BitmapFont((BitmapFontReader.Font)serializer.Deserialize(stream));
-	}
-}
-
-static class BitmapFontExtensions
-{
-	public static void DrawText(this SpriteBatch spriteBatch, BitmapFont font, Vector2 position, string text, Color color)
-	{
-		font.Draw(spriteBatch, position, text, color);
 	}
 }
 
