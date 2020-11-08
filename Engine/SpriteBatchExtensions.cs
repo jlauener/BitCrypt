@@ -16,12 +16,7 @@ static class SpriteBatchExtensions
 
 	public static void DrawPatch(this SpriteBatch spriteBatch, Patch patch, Vector2 position, Point size, Color color)
 	{
-		patch.Draw(spriteBatch, position, size, color, null);
-	}
-
-	public static void DrawPatch(this SpriteBatch spriteBatch, Patch patch, Vector2 position, Point size, Color color, Rectangle? cutRect)
-	{
-		patch.Draw(spriteBatch, position, size, color, cutRect);
+		patch.Draw(spriteBatch, position, size, color);
 	}
 
 	#region Shape

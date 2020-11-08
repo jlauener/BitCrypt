@@ -34,6 +34,11 @@ class BitmapFont
 
 	public Point GetSize(string text)
 	{
+		if (text == null)
+		{
+			return Point.Zero;
+		}
+
 		var currentWidth = 0;
 		var width = 0;
 		var height = 8;

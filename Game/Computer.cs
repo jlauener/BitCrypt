@@ -4,7 +4,7 @@ using System;
 static class Computer
 {
 	public static Color DesktopColor { get; set; }
-	public static Skin StatusBarSkin { get; set; }
+	public static SkinDEP StatusBarSkin { get; set; }
 
 	public static IntValue Disk { get; private set; }
 	public static IntValue Mem { get; private set; }
@@ -20,15 +20,17 @@ static class Computer
 		Mem = new IntValue(0, memMax);
 		Coin = new IntValue(0, coinMax);
 
-		DesktopColor = new Color(0x00, 0x00, 0x12);
+		//DesktopColor = new Color(0x00, 0x00, 0x12);
+		DesktopColor = new Color(0x77, 0x77, 0x88);
 
-		StatusBarSkin = new Skin
+		StatusBarSkin = new SkinDEP
 		{
 			Font = Asset.DefaultFont,
-			TextColor = Color.Black,
-			Patch = new NinePatch(Asset.DefaultTexture, new Point(52, 0), 4),
-			BarBackgroundPatch = new NinePatch(Asset.DefaultTexture, new Point(52, 12), 2),
-			BarFramePatch = new NinePatch(Asset.DefaultTexture, new Point(58, 12), 2),
+			Color = Color.Black,
+			ErrorColor = new Color(0xBE, 0x26, 0x33),
+			//Patch = new NinePatchDEP(Asset.DefaultTexture, new Point(52, 0), 4),
+			//BarBackgroundPatch = new NinePatchDEP(Asset.DefaultTexture, new Point(52, 12), 2),
+			//BarFramePatch = new NinePatchDEP(Asset.DefaultTexture, new Point(58, 12), 2),
 		};
 	}
 
@@ -43,10 +45,10 @@ static class Computer
 
 		Mem.Add(windowData.Mem);
 		var window = Activator.CreateInstance(windowData.WindowClass) as Window;
-		window.SetSkin(windowData.Skin);
+		window.SetSkinDEP(windowData.Skin);
 		window.OnRemovedEvent += () => Mem.Remove(windowData.Mem);
 		desktop.Add(window);
-		window.SetPosition(window.GetRandomPosition());
+		window.SetLocalPosition(window.GetRandomPosition());
 		return true;
 	}
 }

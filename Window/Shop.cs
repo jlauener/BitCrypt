@@ -5,7 +5,7 @@ class Shop : Window
 	public Shop()
 	{
 		Title = "Miner's supplies";
-		Skin = WindowData.ShopSkin; // TODO fix the skin issue!!!
+		SkinDEP = WindowData.ShopSkin; // TODO fix the skin issue!!!
 
 		var layout = Add<Layout>();
 		layout.Margin = Point.Zero;
@@ -45,8 +45,6 @@ class Shop : Window
 		bottomLayout.PackHorizontally();
 
 		layout.PackVertically();
-
-		Pack();
 	}
 
 	private void Buy(WindowData window)

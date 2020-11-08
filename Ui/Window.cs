@@ -5,7 +5,12 @@ using System;
 // TODO window error state (blink title red?)
 class Window : Widget
 {
-	public string Title { get; set; }
+	public string Title
+	{
+		get => titleLabel.Text;
+		set => titleLabel.Text = value;
+	}
+
 	public Window SetTitle(string title)
 	{
 		Title = title;
@@ -16,31 +21,57 @@ class Window : Widget
 	private bool drag;
 	private Vector2 dragOffset;
 
-	public Window Pack()
+	private Panel title;
+	private TextLabel titleLabel;
+	public Panel Content;
+
+	public Window()
 	{
-		var width = 0;
-		var height = 12;
-		var position = new Vector2(8f, 16f);
+		title = Add<Panel>();
+		titleLabel = title.Add<TextLabel>();
+		titleLabel.VerticalAlign = VerticalAlign.Center;
 
-		for (var i = Children.Count - 1; i >= 0; i--)
+		Content = Add<Panel>();
+	}
+
+	public override void OnAdded()
+	{
+		base.OnAdded();
+
+		//title.Patch = Skin.WindowTitlePatch;
+		Resize();
+	}
+
+	protected override void OnSkinChanged(Skin skin)
+	{
+		title.Skin = skin.GetChild("Title");
+		Content.Skin = skin.GetChild("Content");
+	}
+
+	public void Resize()
+	{
+		Content.Resize();
+		Debug.Log("Content size={0}", Content.Size);
+
+		var titleLabelSize = titleLabel.Skin.Font.GetSize(titleLabel.Text);
+		var width = Math.Max(titleLabelSize.X + title.Skin.Patch.PatchSize.X * 2 + 2, Content.Size.X);
+
+		title.Size = new Point(width, 12);
+		titleLabel.Size = new Point(titleLabelSize.X, 12);
+		titleLabel.LocalPosition = new Vector2(title.Skin.Patch.PatchSize.X + 1, 0f);
+
+		Content.Size = new Point(width, Content.Size.Y);
+
+		title.SetLocalPosition(Skin.Patch.PatchSize.X + 1, Skin.Patch.PatchSize.Y + 1);
+		Content.SetLocalPosition(Skin.Patch.PatchSize.X + 1, Skin.Patch.PatchSize.Y  + title.Size.Y + 3);
+
+		// TODO if Content's size is not set window takes full screen... mmh. -> will be fixed with proper Resize() impl
+
+		Size = new Point
 		{
-			var child = Children.list[i];
-			child.Position = position;
-			position.Y += child.Size.Y + 4f;
-			height += child.Size.Y + 4;
-
-			width = Math.Max(width, child.Size.X);
+			X = Content.Size.X + Skin.Patch.PatchSize.X * 2 + 2,
+			Y = title.Size.Y + Content.Size.Y + Skin.Patch.PatchSize.Y * 2 + 4
 		};
-
-		width += 16;
-		height += 8;
-
-		// TODO either make it work with any size, or use 4px basic unit (seems like a good idea ?)
-		width = ((int)Math.Ceiling(width / 4f)) * 4;
-		height = ((int)Math.Ceiling(height / 4f)) * 4;
-
-		Size = new Point(width, height);
-		return this;
 	}
 
 	public override void Update()
@@ -49,9 +80,9 @@ class Window : Widget
 
 		if (drag)
 		{
-			var position = Input.MousePosition - Parent.ScreenPosition + dragOffset;
+			var position = Input.MousePosition - Parent.Position + dragOffset;
 
-			// TODO Mathf.Clamp?
+			// TODO Mathf.Clamp
 
 			if (position.X < 0f)
 			{
@@ -71,7 +102,7 @@ class Window : Widget
 				position.Y = Parent.Size.Y - Size.Y;
 			}
 
-			Position = position;
+			LocalPosition = position;
 		}
 	}
 
@@ -83,13 +114,10 @@ class Window : Widget
 
 		if (Draggable)
 		{
-			var localPosition = Input.MousePosition - ScreenPosition;
-			if (localPosition.Y < 12f)
+			if (title.Contains(Input.MousePosition))
 			{
-				// TODO use widget for title bar
-				// Click on title bar
 				drag = true;
-				dragOffset = ScreenPosition - Input.MousePosition;
+				dragOffset = Position - Input.MousePosition;
 			}
 		}
 	}
@@ -116,17 +144,21 @@ class Window : Widget
 
 	public override void Draw(SpriteBatch spriteBatch)
 	{
-		spriteBatch.DrawPatch(Skin.WindowTitlePatch, ScreenPosition, new Point(Size.X, 8), Color);
-		spriteBatch.DrawPatch(Skin.WindowFramePatch, ScreenPosition + new Vector2(0f, 8f), new Point(Size.X, Size.Y - 8), Color);
+		spriteBatch.DrawPatch(Skin.Patch, Position, Size, Color);
+		//spriteBatch.DrawPatch(Skin.WindowTitlePatch, ScreenPosition, new Point(Size.X, 8), Color);
+		//spriteBatch.DrawPatch(Skin.WindowFramePatch, ScreenPosition + new Vector2(0f, 8f), new Point(Size.X, Size.Y - 8), Color);
 
-		spriteBatch.DrawText(Skin.WindowTitleFont, ScreenPosition + new Vector2(4f, 2f), Title, Skin.WindowTitleTextColor);
+		//if (Title != null)
+		//{
+		//	spriteBatch.DrawText(Skin.WindowTitleFont, Position + new Vector2(4f, 2f), Title, Skin.WindowTitleTextColor);
+		//}
 
 		base.Draw(spriteBatch);
 	}
 
 	public override string ToString()
 	{
-		return string.Format("[Window pos={0} title={1}]", ScreenPosition, Title);
+		return string.Format("[Window pos={0} title={1}]", Position, Title);
 	}
 
 	public Vector2 GetRandomPosition()

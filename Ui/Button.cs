@@ -50,11 +50,11 @@ class Button : Widget
 	{
 		if (pressed)
 		{
-			spriteBatch.DrawPatch(Skin.ButtonPressedPatch, ScreenPosition, Size, Enabled ? Color : Skin.DisabledColor);
+			spriteBatch.DrawPatch(SkinDEP.ButtonPressedPatch, Position, Size, Enabled ? Color : SkinDEP.DisabledColor);
 		}
 		else
 		{
-			spriteBatch.DrawPatch(Skin.ButtonReleasedPatch, ScreenPosition, Size, Enabled ? Color : Skin.DisabledColor);
+			spriteBatch.DrawPatch(SkinDEP.ButtonReleasedPatch, Position, Size, Enabled ? Color : SkinDEP.DisabledColor);
 		}
 
 		base.Draw(spriteBatch);
@@ -62,6 +62,6 @@ class Button : Widget
 
 	public override string ToString()
 	{
-		return string.Format("[Button pos={0} pressed={1}]", ScreenPosition, pressed);
+		return string.Format("[Button pos={0} pressed={1}]", Position, pressed);
 	}
 }

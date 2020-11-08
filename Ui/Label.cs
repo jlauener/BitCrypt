@@ -1,15 +1,13 @@
-﻿using BitmapFontReader;
-using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
+﻿using Microsoft.Xna.Framework.Graphics;
 
-enum Horizontal
+enum HorizontalAlign
 {
 	Left,
 	Center,
 	Right
 }
 
-enum Vertical
+enum VerticalAlign
 {
 	Top, 
 	Center,
@@ -20,15 +18,15 @@ abstract class Label : Widget
 {
 	protected string text;
 
-	public Horizontal HorizontalAlign { get; set; } = Horizontal.Left;
-	public Label SetHorizontalAlign(Horizontal align)
+	public HorizontalAlign HorizontalAlign { get; set; } = HorizontalAlign.Left;
+	public Label SetHorizontalAlign(HorizontalAlign align)
 	{
 		HorizontalAlign = align;
 		return this;
 	}
 
-	public Vertical VerticalAlign { get; set; } = Vertical.Top;
-	public Label SetVerticalAlign(Vertical align)
+	public VerticalAlign VerticalAlign { get; set; } = VerticalAlign.Top;
+	public Label SetVerticalAlign(VerticalAlign align)
 	{
 		VerticalAlign = align;
 		return this;
@@ -36,8 +34,8 @@ abstract class Label : Widget
 
 	public Label Center()
 	{
-		HorizontalAlign = Horizontal.Center;
-		VerticalAlign = Vertical.Center;
+		HorizontalAlign = HorizontalAlign.Center;
+		VerticalAlign = VerticalAlign.Center;
 		return this;
 	}
 
@@ -45,42 +43,36 @@ abstract class Label : Widget
 	{
 		if (text != null)
 		{
-			var position = ScreenPosition;
+			var position = Position;
 			var size = Skin.Font.GetSize(text); // TODO Cache text size, again use dirty flag + Repaint() method !
 
 			switch (HorizontalAlign)
 			{
-				case Horizontal.Center:
+				case HorizontalAlign.Center:
 					position.X += Size.X / 2 - size.X / 2;
 					break;
-				case Horizontal.Right:
+				case HorizontalAlign.Right:
 					position.X += Size.X - size.X;
 					break;
 			}
 
 			switch (VerticalAlign)
 			{
-				case Vertical.Center:
+				case VerticalAlign.Center:
 					position.Y += Size.Y / 2 - size.Y / 2;
 					break;
-				case Vertical.Bottom:
+				case VerticalAlign.Bottom:
 					position.Y += Size.Y - size.Y;
 					break;
 			}
 
-			spriteBatch.DrawText(Skin.Font, position, text, Enabled ? Color : Skin.DisabledColor);
+			spriteBatch.DrawText(Skin.Font, position, text, Enabled || !Skin.DisabledColor.HasValue ? Skin.Color : Skin.DisabledColor.Value);
 		}
-	}
-
-	protected override void ApplySkin()
-	{
-		base.ApplySkin();
-		Color = Skin.TextColor;
 	}
 
 	public override string ToString()
 	{
-		return string.Format("[Label pos={0} text={1}]", ScreenPosition, text);
+		return string.Format("[Label pos={0} text={1}]", Position, text);
 	}
 }
 
@@ -158,6 +150,8 @@ class ValueLabel : Label
 
 	private void HandleValueChanged(IntValueChangedEvent evt)
 	{
+		// TODO
+		//Color = Value.Full ? SkinDEP.ErrorColor : SkinDEP.Color;
 		text = string.Format(Format, Value.Value, Value.Max, Value.Free);
 	}
 }

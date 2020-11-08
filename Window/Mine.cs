@@ -1,5 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using System;
+using System.Collections;
 
 class Mine : Window
 {
@@ -15,7 +16,7 @@ class Mine : Window
 	private int level = 0;
 	private int upgradeCost = 256;
 
-	private readonly TextLabel coinPerSecLabel;
+	private readonly TextLabel label;
 	private readonly Button transferButton; // TODO make it blink/flash/text bounce when full?
 	private readonly BuyButton upgradeButton;
 
@@ -23,7 +24,7 @@ class Mine : Window
 	{
 		Title = string.Format(TITLE_FORMAT, level);
 
-		(coinPerSecLabel = Add<TextLabel>())
+		(label = Add<TextLabel>())
 			.SetText(COIN_PER_SEC_FORMAT, CoinPerSec)
 			.SetSize(88, 8)
 		;
@@ -38,62 +39,131 @@ class Mine : Window
 		;
 
 		(transferButton = Add<Button>())
-			.SetOnPressed(() => Coin.MoveTo(Computer.Coin))
+			.SetOnPressed(() =>
+			{
+				if (!Computer.Coin.Full)
+				{
+					SetState(Transfer());
+				}
+				else
+				{
+					// TODO report error
+				}
+			})
 			.SetSize(88, 12)
 			.Add<TextLabel>().SetText("transfer").Center();
 		;
 
 		(upgradeButton = Add<BuyButton>())
 			.SetCost(upgradeCost)
-			.SetOnPressed(Upgrade)
+			.SetBuyDuration(3f)
+			.SetOnBuy(() => SetState(Upgrade()))
 			.SetSize(88, 12)
 			.Add<TextLabel>().SetText(UPGRADE_FORMAT, upgradeCost).Center();
 		;
-
-		Pack();
 	}
 
-	public override void Update()
+	private Coroutine state;
+	private void SetState(IEnumerator state)
 	{
-		base.Update();
-
-		coinCounter += Time.DeltaTime * CoinPerSec;
-		var coinToAdd = (int)Math.Floor(coinCounter);
-		if (coinToAdd > 0)
+		if (this.state != null)
 		{
-			coinCounter -= coinToAdd;
-			Coin.Add(coinToAdd);
+			this.state.Stop();
+			this.state = null;
 		}
 
-		var labelColor = Coin.Value == Coin.Max ? Color.Red : Skin.TextColor;
-
-		coinPerSecLabel.Color = labelColor;
-		if (Coin.Value == Coin.Max)
+		if (state != null)
 		{
-			coinPerSecLabel.Color = new Color(0xBE, 0x26, 0x33);
-			coinPerSecLabel.SetText(COIN_PER_SEC_FORMAT, 0);
-		}
-		else
-		{
-			coinPerSecLabel.Color = Skin.TextColor;
-			coinPerSecLabel.SetText(COIN_PER_SEC_FORMAT, CoinPerSec);
+			this.state = Core.StartCoroutine(state);
 		}
 	}
 
-	private void Upgrade()
+	public override void OnAdded()
 	{
-		if (Computer.Coin.Pay(upgradeCost))
+		base.OnAdded();
+
+		SetState(Idle());
+	}
+
+	private IEnumerator Idle()
+	{
+		label.SetText(COIN_PER_SEC_FORMAT, CoinPerSec);
+
+		transferButton.Enabled = true;
+		transferButton.Get<Label>().Enabled = true;
+
+		upgradeButton.BuyEnabled = true;
+
+		while (true)
 		{
-			level++;
-			Title = string.Format(TITLE_FORMAT, level);
+			coinCounter += Time.DeltaTime * CoinPerSec;
+			var coinToAdd = (int)Math.Floor(coinCounter);
+			if (coinToAdd > 0)
+			{
+				coinCounter -= coinToAdd;
+				Coin.Add(coinToAdd);
 
-			Coin.ModifyMax(Coin.Max);
-			CoinPerSec *= 1.5f;
-			coinPerSecLabel.SetText(COIN_PER_SEC_FORMAT, CoinPerSec);
+				if (Coin.Full) SetState(Full());
+			}
 
-			upgradeCost *= 2;
-			upgradeButton.SetCost(upgradeCost);
-			upgradeButton.Get<TextLabel>().SetText(UPGRADE_FORMAT, upgradeCost);
+			yield return null;
 		}
+	}
+
+	private IEnumerator Full()
+	{
+		label.SetText(COIN_PER_SEC_FORMAT, 0);
+
+		while (true)
+		{
+			if (!Coin.Full) SetState(Idle());
+			yield return null;
+		}
+	}
+
+	private IEnumerator Upgrade()
+	{
+		label.SetText("Upgrading...");
+
+		transferButton.Enabled = false;
+		transferButton.Get<Label>().Enabled = false;
+
+		yield return Core.WaitForSeconds(upgradeButton.BuyDuration);
+
+		level++;
+		Title = string.Format(TITLE_FORMAT, level);
+
+		Coin.ModifyMax(Coin.Max);
+		CoinPerSec *= 1.5f;
+		label.SetText(COIN_PER_SEC_FORMAT, CoinPerSec);
+
+		upgradeCost *= 2;
+		upgradeButton.SetCost(upgradeCost);
+		upgradeButton.Get<TextLabel>().SetText(UPGRADE_FORMAT, upgradeCost);
+
+		SetState(Idle());
+	}
+
+	private IEnumerator Transfer()
+	{
+		label.SetText("Transfering...");
+
+		transferButton.Enabled = false;
+		transferButton.Get<Label>().Enabled = false;
+
+		upgradeButton.BuyEnabled = false;
+
+		// TODO find a better way to transfer a floating value...
+		var transferPerSec = 60f;
+		while (Coin.Value > 0)
+		{
+			if (Coin.MoveTo(Computer.Coin, (int)(transferPerSec * Time.DeltaTime)) == 0)
+			{
+				SetState(Idle());
+			}
+			transferPerSec *= 1.1f;
+			yield return null;
+		}
+		SetState(Idle());
 	}
 }

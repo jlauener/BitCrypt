@@ -6,6 +6,12 @@ class Layout : Widget
 {
 	public Patch Background { get; set; }
 
+	public Layout SetBackground(Patch background)
+	{
+		Background = background;
+		return this;
+	}
+
 	public Point Margin  = new Point(4, 4);
 	public Point Pan = new Point(4, 4);
 
@@ -16,7 +22,7 @@ class Layout : Widget
 		for (var i = Children.Count - 1; i >= 0; i--)
 		{
 			var child = Children.list[i];
-			child.Position = new Vector2(Margin.X, size.Y);
+			child.LocalPosition = new Vector2(Margin.X, size.Y);
 			size.Y += child.Size.Y;
 			if (i > 0) size.Y += Pan.Y;
 			size.X = Math.Max(size.X, child.Size.X + Margin.X);
@@ -39,7 +45,7 @@ class Layout : Widget
 		for (var i = Children.Count - 1; i >= 0; i--)
 		{
 			var child = Children.list[i];
-			child.Position = new Vector2(size.X, Margin.Y);
+			child.LocalPosition = new Vector2(size.X, Margin.Y);
 			size.X += child.Size.X;
 			if (i > 0) size.X += Pan.X;
 			size.Y = Math.Max(size.Y, child.Size.Y + Margin.Y);
@@ -59,7 +65,7 @@ class Layout : Widget
 	{
 		if (Background != null)
 		{
-			spriteBatch.DrawPatch(Background, ScreenPosition, Size, Color);
+			spriteBatch.DrawPatch(Background, Position, Size, Color);
 		}
 
 		base.Draw(spriteBatch);

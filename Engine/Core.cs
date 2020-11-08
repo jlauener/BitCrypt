@@ -2,6 +2,9 @@
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
 
 class Core : Game
 {
@@ -22,7 +25,7 @@ class Core : Game
 	private Scene scene;
 
 	private bool debug;
-	
+
 	public Core()
 	{
 		Instance = this;
@@ -92,6 +95,7 @@ class Core : Game
 		}
 
 		scene.Update();
+		UpdateCoroutines();
 	}
 
 	protected override void Draw(GameTime gameTime)
@@ -99,15 +103,16 @@ class Core : Game
 		base.Draw(gameTime);
 
 		GraphicsDevice.SetRenderTarget(renderTarget);
-		GraphicsDevice.Clear(BackgroundColor);
+		GraphicsDevice.Clear(Core.BackgroundColor);
 
-		spriteBatch.Begin(samplerState : SamplerState.PointClamp);
+		// TODO figure out performance difference between Immediate and Deferred
+		spriteBatch.Begin(sortMode: SpriteSortMode.Immediate, samplerState: SamplerState.PointClamp);
 		scene.Draw(spriteBatch);
 		if (debug) scene.DrawDebug(spriteBatch);
 		spriteBatch.End();
 
 		GraphicsDevice.SetRenderTarget(null);
-		spriteBatch.Begin(samplerState: SamplerState.PointClamp);
+		spriteBatch.Begin(sortMode: SpriteSortMode.Immediate, samplerState: SamplerState.PointClamp);
 		spriteBatch.Draw(renderTarget, graphics.IsFullScreen ? fullscreenBounds : windowBounds, Color.White);
 		spriteBatch.End();
 	}
@@ -128,4 +133,68 @@ class Core : Game
 			Instance.scene.Init();
 		}
 	}
+
+	#region Coroutine
+
+	private readonly List<Coroutine> coroutines = new List<Coroutine>();
+
+	public static Coroutine StartCoroutine(IEnumerator routine)
+	{
+		var coroutine = new Coroutine(routine);
+		Instance.coroutines.Add(coroutine);
+		Debug.Log("start " + routine);
+		return coroutine;
+	}
+
+	public static Coroutine WaitForSeconds(float duration)
+	{
+		return StartCoroutine(WaitForSecondsRoutine(duration));
+	}
+
+	private static IEnumerator WaitForSecondsRoutine(float duration)
+	{
+		while (duration > 0f)
+		{
+			duration -= Time.DeltaTime;
+			yield return null;
+		}
+		yield break;
+	}
+
+	private void UpdateCoroutines()
+	{
+		foreach (Coroutine coroutine in coroutines.Reverse<Coroutine>())
+		{
+			if (coroutine.routine.Current is Coroutine)
+				coroutine.waitForCoroutine = coroutine.routine.Current as Coroutine;
+
+			if (coroutine.waitForCoroutine != null && coroutine.waitForCoroutine.finished)
+				coroutine.waitForCoroutine = null;
+
+			if (coroutine.waitForCoroutine != null)
+				continue;
+
+			// update coroutine
+
+			if (coroutine.finished)
+			{
+				Debug.Log("stop " + coroutine.routine + " (external)");
+				coroutines.Remove(coroutine);
+			}
+			else if (!coroutine.routine.MoveNext())
+			{
+				Debug.Log("stop " + coroutine.routine + " (internal)");
+				coroutines.Remove(coroutine);
+				coroutine.finished = true;
+			}
+			else if (coroutine.finished)
+			{
+				Debug.Log("stop " + coroutine.routine + " (external)");
+				coroutines.Remove(coroutine);
+			}
+		}
+	}
+
+	#endregion
+
 }

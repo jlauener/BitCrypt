@@ -15,6 +15,7 @@ class IntValue
 	public int Value { get; private set; }
 	public int Max { get; private set; }
 	public int Free => Max - Value;
+	public bool Full => Value >= Max;
 
 	public IntValue(int value, int max = 0)
 	{
@@ -71,10 +72,16 @@ class IntValue
 		return true;
 	}
 
-	public void MoveTo(IntValue other)
+	public int MoveTo(IntValue other, int amount)
 	{
-		Remove(other.Add(Value));
-	}	
+		if (amount == 0) return 0;
+		return Remove(other.Add(amount));
+	}
+
+	public int MoveTo(IntValue other)
+	{
+		return MoveTo(other, other.Value);
+	}
 
 	public override string ToString()
 	{

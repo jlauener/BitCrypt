@@ -9,6 +9,22 @@ class Widget
 
 	public Widget Parent { get; set; }
 
+	private SkinDEP skinDEP;
+	public SkinDEP SkinDEP
+	{
+		get => skinDEP != null ? skinDEP : (Parent != null ? Parent.SkinDEP : null);
+		set
+		{
+			skinDEP = value;
+		}
+	}
+
+	public Widget SetSkinDEP(SkinDEP skin)
+	{
+		SkinDEP = skin;
+		return this;
+	}
+
 	private Skin skin;
 	public Skin Skin
 	{
@@ -16,7 +32,7 @@ class Widget
 		set
 		{
 			skin = value;
-			if (skin != null) ApplySkin();
+			OnSkinChanged(Skin);
 		}
 	}
 
@@ -26,19 +42,19 @@ class Widget
 		return this;
 	}
 
-	protected virtual void ApplySkin()
+	protected virtual void OnSkinChanged(Skin skin)
 	{
 	}
 
-	public Vector2 Position { get; set; }
-	public Widget SetPosition(Vector2 position)
+	public Vector2 LocalPosition { get; set; }
+	public Widget SetLocalPosition(Vector2 position)
 	{
-		Position = position;
+		LocalPosition = position;
 		return this;
 	}
-	public Widget SetPosition(float x, float y)
+	public Widget SetLocalPosition(float x, float y)
 	{
-		return SetPosition(new Vector2(x, y));
+		return SetLocalPosition(new Vector2(x, y));
 	}
 
 	public Vector2 Offset { get; set; }
@@ -87,9 +103,10 @@ class Widget
 	public bool AlwaysOnTop { get; set; }
 
 	// TODO Optimize ScreenPosition calculation. Maybe add a dirty flag? Something like repaint !
-	public Vector2 ScreenPosition
+	public Vector2 Position
 	{
-		get => (Parent != null ? Parent.ScreenPosition + Position : Position) + Offset;
+		get => (Parent != null ? Parent.Position + LocalPosition : LocalPosition) + Offset;
+		// TODO set global position
 	}
 
 	public SafeList<Widget> Children { get; } = new SafeList<Widget>();
@@ -118,7 +135,7 @@ class Widget
 	public T Add<T>(T child) where T : Widget
 	{
 		child.Parent = this;
-		if (Skin != null) child.Skin = Skin;
+		if (SkinDEP != null) child.SkinDEP = SkinDEP;
 
 		var targetIndex = 0;
 		for (var i = 0; i < Children.Count; i++)
@@ -197,7 +214,7 @@ class Widget
 
 	public bool Contains(Vector2 position)
 	{
-		var bounds = new Rectangle((int)ScreenPosition.X, (int)ScreenPosition.Y, Size.X, Size.Y);
+		var bounds = new Rectangle((int)Position.X, (int)Position.Y, Size.X, Size.Y);
 		return bounds.Contains(new Point((int)position.X, (int)position.Y));
 	}
 
@@ -222,9 +239,14 @@ class Widget
 
 	public virtual void OnAdded()
 	{
+		//if (skinDEP == null && Parent != null && Parent.SkinDEP != null)
+		//{
+		//	ApplySkinDEP();
+		//}
+
 		if (skin == null && Parent != null && Parent.Skin != null)
 		{
-			ApplySkin();
+			Skin = skin;
 		}
 	}
 
@@ -280,7 +302,7 @@ class Widget
 
 	public virtual void DrawDebug(SpriteBatch spriteBatch)
 	{
-		spriteBatch.DrawRect(new Rectangle((int)ScreenPosition.X, (int)ScreenPosition.Y, Size.X, Size.Y), Color.Yellow);
+		spriteBatch.DrawRect(new Rectangle((int)Position.X, (int)Position.Y, Size.X, Size.Y), Color.Yellow);
 		for (var i = Children.Count - 1; i >= 0; i--)
 		{
 			Children.list[i].DrawDebug(spriteBatch);

@@ -2,122 +2,103 @@
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 
-// TODO mouse cursor (maybe sprite class simply?)
+// TODO implement cursor class
 class GameScene : Scene
 {
 	private Widget rootWidget;
-	private Widget statusBar;
 	private Widget desktop;
 
-	//private TextLabel statusLabel;
 	private TextLabel debugLabel;
-
-	//private IntValue barValue;
 
 	public override void Init()
 	{
 		base.Init();
 
-		Core.BackgroundColor = Computer.DesktopColor;
-
 		rootWidget = new RootWidget().SetSize(Core.ScreenSize);
 		desktop = rootWidget.Add<Widget>()
-			.SetPosition(0f, 12f)
+			.SetLocalPosition(0f, 12f)
 			.SetSize(Core.ScreenSize.X, Core.ScreenSize.Y - 12);
 
 		Computer.Init(desktop, diskMax: 1024, memMax: 512, coinMax: 512);
 
-		statusBar = rootWidget.Add<Panel>()
-			.SetSkin(Computer.StatusBarSkin)
-			.SetSize(Core.ScreenSize.X, 16);
+		Core.BackgroundColor = Computer.DesktopColor;
 
-		(debugLabel = statusBar.Add<TextLabel>())
-			.SetHorizontalAlign(Horizontal.Right)
-			.SetVerticalAlign(Vertical.Center)
-			.SetPosition(Core.ScreenSize.X / 2, 2f)
-			.SetSize(Core.ScreenSize.X / 2 - 4, 12)
+		//var statusBar = rootWidget.Add<Panel>()
+		//	.SetSkinDEP(Computer.StatusBarSkin)
+		//	.SetSize(Core.ScreenSize.X, 16);
+
+		//(debugLabel = statusBar.Add<TextLabel>())
+		//	.SetHorizontalAlign(HorizontalAlign.Right)
+		//	.SetVerticalAlign(VerticalAlign.Center)
+		//	.SetLocalPosition(Core.ScreenSize.X / 2, 2f)
+		//	.SetSize(Core.ScreenSize.X / 2 - 4, 12)
+		//;
+
+		//statusBar.Add<Bar>()
+		//	.SetValue(Computer.Disk)
+		//	.SetLocalPosition(4f, 2f)
+		//	.SetSize(56, 12)
+		//	.Add<TextLabel>()
+		//		.SetText("DISK")
+		//		.Center()
+		//;
+
+		//statusBar.Add<Bar>()
+		//	.SetValue(Computer.Mem)
+		//	.SetInverse(true)
+		//	.SetLocalPosition(66f, 2f)
+		//	.SetSize(60, 12)		
+		//	.Add<ValueLabel>()
+		//		.SetFormat("MEM {2}Kb")
+		//		.SetValue(Computer.Mem)
+		//		.Center()
+		//;
+
+		//statusBar.Add<ValueLabel>()
+		//	.SetFormat("COIN {0}/{1}")
+		//	.SetValue(Computer.Coin)
+		//	.SetVerticalAlign(Vertical.Center)
+		//	.SetLocalPosition(140, 2f)
+		//	.SetSize(56, 12)
+		//;
+
+		//Computer.CreateWindow(WindowData.Mine);		
+
+		var windowSkin = new Skin
+		{
+			Texture = Asset.DefaultTexture,
+			Font = Asset.DefaultFont,
+			Color = Color.White,
+			ErrorColor = new Color(0xBE, 0x26, 0x33),
+			DisabledColor = new Color(0x9D, 0x9D, 0x9D),
+			Patch = new Patch(Asset.DefaultTexture, new Point(32, 100), new Point(4, 4)),
+		};
+
+		var titleSkin = windowSkin.CreateChild("Title");
+		titleSkin.Color = Color.Black;
+		titleSkin.Patch = new Patch(Asset.DefaultTexture, new Point(44, 100), new Point(2, 2));
+
+		var contentSkin = windowSkin.CreateChild("Content");
+		contentSkin.Color = Color.White;
+		contentSkin.Patch = new Patch(Asset.DefaultTexture, new Point(44, 105), new Point(2, 2));
+
+		var window = desktop.Add<Window>();
+		window
+			.SetTitle("Hello!")
+			.SetSkin(windowSkin)
+			.SetLocalPosition(100, 100)
 		;
 
-		statusBar.Add<Bar>()
-			.SetValue(Computer.Disk)
-			.SetPosition(4f, 2f)
-			.SetSize(56, 12)
-			.Add<TextLabel>()
-				.SetText("DISK")
-				.Center()
-		;
+		window.Content.Layout = PanelLayout.Vertical;
+		window.Content.Add<TextLabel>().SetText("label 1").Pack(); // TODO must be done automagically with Resize()
+		window.Content.Add<TextLabel>().SetText("label 2").Pack();
 
-		statusBar.Add<Bar>()
-			.SetValue(Computer.Mem)
-			.SetInverse(true)
-			.SetPosition(66f, 2f)
-			.SetSize(60, 12)		
-			.Add<ValueLabel>()
-				.SetFormat("MEM {2}Kb")
-				.SetValue(Computer.Mem)
-				.Center()
-		;
+		// TODO button, bar, close button, over fx, disabled fx, shadow and DONE!
 
-		statusBar.Add<ValueLabel>()
-			.SetFormat("COIN {0}/{1}")
-			.SetValue(Computer.Coin)
-			.SetVerticalAlign(Vertical.Center)
-			.SetPosition(140, 2f)
-			.SetSize(56, 12)
-		;
-
-		//Computer.CreateWindow(WindowData.Mine);
-
-		//var layout = desktop.Add<Layout>();
-		//layout.SetSkin(WindowData.ShopSkin).SetPosition(40, 80);
-		//layout.Background = WindowData.ShopSkin.WindowFramePatch;
-
-		//var topLayout = layout.Add<Layout>();
-		////vLayout.Background = WindowData.PlayerSkin.WindowFramePatch;
-		//topLayout.Add<Image>().SetSprite(new Sprite(Asset.DefaultTexture, new Rectangle(4, 64, 28, 28)));
-		//topLayout.Add<TextLabel>().SetText("Hello! Welcome to the\nminer's paradise!").Pack();
-		//topLayout.PackHorizontally();
-
-
-		//var hLayout = layout.Add<Layout>();
-		////hLayout.Background = WindowData.PlayerSkin.WindowFramePatch;
-		//hLayout.Add<Button>().SetSize(32, 32);
-		//hLayout.Add<Button>().SetSize(32, 32);
-		//hLayout.Add<Button>().SetSize(32, 32);
-		//hLayout.PackHorizontally();
-
-		//layout.PackVertically();
-
-		//layout.Add<Panel>().SetSkin(WindowData.PlayerSkin);
-
-		//barValue = new IntValue(0, 1000);
-
-		//var bar = new Bar(barValue);
-		//bar.Size = new Point(64, 12);
-		//bar.Position = new Vector2(120f, 80f);
-		//bar.BackgroundPatch = new NinePatch(Asset.SkinTexture, new Point(26, 22), 2);
-		//bar.FramePatch = new NinePatch(Asset.SkinTexture, new Point(32, 22), 2);
-		//bar.Add<ValueLabel>().SetValue(barValue).Center().SetSkin(Computer.PlayerSkin);
-		//desktop.Add(bar);
-		//var w = desktop.Add<Window>().SetTitle("Enemy!");
-		//w.Draggable = false;
-		//w.AlwaysOnTop = true;
-		//w.SetSkin(Computer.Instance.EnemySkin).SetPosition(510f, 190f);
-		//w.Add<Label>().SetText("Helloo").SetSize(80, 8);
-		//var removeButton = w.Add<Button>();
-		//removeButton.SetSize(80, 12);
-		//removeButton.Add<Label>().SetText("Remove").Center();
-		//removeButton.OnPressed += () => w.Remove();
-		//w.Pack();
-
-		//desktop.Add<Button>()
-		//	.AddOnPressed(() => Debug.Log("test button pressed"))
-		//	.SetSkin(Computer.Instance.PlayerSkin)
-		//	.SetSize(64, 64).SetPosition(80f, 50f)
-		//		.Add<Label>()
-		//		.SetText("Hello!")
-		//		.SetHorizontalAlign(Horizontal.Center)
-		//		.SetVerticalAlign(Vertical.Center)
+		//desktop.Add<TextLabel>()
+		//	.SetText("Hello World!")
+		//	.SetSkin(WindowData.PlayerSkin)
+		//	.SetLocalPosition(108, 108)
 		//;
 	}
 
@@ -137,17 +118,32 @@ class GameScene : Scene
 
 		if (Input.WasKeyPressed(Keys.D3))
 		{
-			Computer.CreateWindow(WindowData.Malware);
+			Computer.CreateWindow(WindowData.Booster);
 		}
 
 		if (Input.WasKeyPressed(Keys.D4))
 		{
+			Computer.CreateWindow(WindowData.Malware);
+		}
+
+		if (Input.WasKeyPressed(Keys.D5))
+		{
 			Computer.CreateWindow(WindowData.Shop);
+		}
+
+		if (Input.WasKeyPressed(Keys.F1))
+		{
+			Computer.Coin.Add(128);
+		}
+
+		if (Input.WasKeyPressed(Keys.F2))
+		{
+			Computer.Coin.Add(1024);
 		}
 
 		rootWidget.Update();
 
-		debugLabel.Text = string.Format("{0},{1}", Input.MousePosition.X, Input.MousePosition.Y);
+		//debugLabel.Text = string.Format("{0},{1}", Input.MousePosition.X, Input.MousePosition.Y);
 
 		if ((Input.IsKeyDown(Keys.LeftShift) | Input.IsKeyDown(Keys.RightShift)) && Input.WasKeyPressed(Keys.R))
 		{

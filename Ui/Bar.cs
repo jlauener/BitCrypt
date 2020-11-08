@@ -54,8 +54,10 @@ class Bar : Widget
 
 	public override void Draw(SpriteBatch spriteBatch)
 	{
-		spriteBatch.DrawPatch(Skin.BarBackgroundPatch, ScreenPosition, Size, Color);
-		spriteBatch.DrawPatch(Skin.BarFramePatch, ScreenPosition + new Vector2(2f, 2f), barSize, Color, cutOut);
+		spriteBatch.DrawPatch(SkinDEP.BarBackgroundPatch, Position, Size, Color);
+		
+		// TODO
+		//spriteBatch.DrawPatch(Skin.BarFramePatch, ScreenPosition + new Vector2(2f, 2f), barSize, Color, cutOut);
 
 		base.Draw(spriteBatch);
 	}

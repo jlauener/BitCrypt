@@ -26,8 +26,6 @@
 			.Add<TextLabel>().SetText(UPGRADE_FORMAT, upgradeCost).Center();
 		;
 
-		Pack();
-
 		upgradeButton.OnPressed += () =>
 		{
 			if (Computer.Coin.Pay(upgradeCost))

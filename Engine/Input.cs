@@ -8,6 +8,7 @@ enum MouseButton
 	Middle
 }
 
+// TODO fix mouse position in window mode (doesn't scale with real mouse position outside of window)
 static class Input
 {
 	private static Vector2 mousePosition;
