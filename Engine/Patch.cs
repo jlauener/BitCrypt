@@ -14,14 +14,16 @@ class Patch
 	private const int CENTER = 8;
 
 	private readonly Texture2D texture;
-	public Point PatchSize { get; }
+	public Point Size { get; }
+	public Point Margin { get; }
 
 	private readonly Rectangle[] patches;
 
 	public Patch(Texture2D texture, Point patchOrigin, Point patchSize)
 	{
 		this.texture = texture;
-		this.PatchSize = patchSize;
+		Size = patchSize;
+		Margin = new Point(Size.X + 1, Size.Y + 1);
 
 		patches = new Rectangle[9];
 		patches[TOP_LEFT] = new Rectangle(patchOrigin.X, patchOrigin.Y, patchSize.X, patchSize.Y);
@@ -37,17 +39,17 @@ class Patch
 
 	public void Draw(SpriteBatch spriteBatch, Vector2 position, Point size, Color color)
 	{
-		DrawPatch(spriteBatch, position, TOP_LEFT, color, 0, 0, PatchSize.X, PatchSize.Y);
-		DrawPatch(spriteBatch, position, TOP_RIGHT, color, size.X - PatchSize.X, 0, PatchSize.X, PatchSize.Y);
-		DrawPatch(spriteBatch, position, BOTTOM_LEFT, color, 0, size.Y - PatchSize.Y, PatchSize.X, PatchSize.Y);
-		DrawPatch(spriteBatch, position, BOTTOM_RIGHT, color, size.X - PatchSize.X, size.Y - PatchSize.Y, PatchSize.X, PatchSize.Y);
+		DrawPatch(spriteBatch, position, TOP_LEFT, color, 0, 0, Size.X, Size.Y);
+		DrawPatch(spriteBatch, position, TOP_RIGHT, color, size.X - Size.X, 0, Size.X, Size.Y);
+		DrawPatch(spriteBatch, position, BOTTOM_LEFT, color, 0, size.Y - Size.Y, Size.X, Size.Y);
+		DrawPatch(spriteBatch, position, BOTTOM_RIGHT, color, size.X - Size.X, size.Y - Size.Y, Size.X, Size.Y);
 
-		DrawPatch(spriteBatch, position, TOP, color, PatchSize.X, 0, size.X - 2 * PatchSize.X, PatchSize.Y);
-		DrawPatch(spriteBatch, position, BOTTOM, color, PatchSize.X, size.Y - PatchSize.Y, size.X - 2 * PatchSize.X, PatchSize.Y);
-		DrawPatch(spriteBatch, position, LEFT, color, 0, PatchSize.Y, PatchSize.X, size.Y - 2 * PatchSize.Y);
-		DrawPatch(spriteBatch, position, RIGHT, color, size.X - PatchSize.X, PatchSize.Y, PatchSize.X, size.Y - 2 * PatchSize.Y);
+		DrawPatch(spriteBatch, position, TOP, color, Size.X, 0, size.X - 2 * Size.X, Size.Y);
+		DrawPatch(spriteBatch, position, BOTTOM, color, Size.X, size.Y - Size.Y, size.X - 2 * Size.X, Size.Y);
+		DrawPatch(spriteBatch, position, LEFT, color, 0, Size.Y, Size.X, size.Y - 2 * Size.Y);
+		DrawPatch(spriteBatch, position, RIGHT, color, size.X - Size.X, Size.Y, Size.X, size.Y - 2 * Size.Y);
 
-		DrawPatch(spriteBatch, position, CENTER, color, PatchSize.X, PatchSize.Y, size.X - 2 * PatchSize.X, size.Y - 2 * PatchSize.Y);
+		DrawPatch(spriteBatch, position, CENTER, color, Size.X, Size.Y, size.X - 2 * Size.X, size.Y - 2 * Size.Y);
 	}
 
 	private void DrawPatch(SpriteBatch spriteBatch, Vector2 position, int quadId, Color color, int x, int y, int width, int height)

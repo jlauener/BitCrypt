@@ -17,9 +17,10 @@ class Panel : Widget
 	public Point? Margin { get; set; }
 	public Point Pan { get; set; } = new Point(2, 2);
 
-	// TODO should be std widget stuffs
-	public void Resize()
+	public override void Resize()
 	{
+		base.Resize();
+
 		switch (Layout)
 		{
 			case PanelLayout.Vertical:
@@ -83,8 +84,8 @@ class Panel : Widget
 		{
 			return new Point
 			{
-				X = Skin.Patch.PatchSize.X + Pan.X,
-				Y = Skin.Patch.PatchSize.Y + Pan.Y
+				X = Skin.Patch.Size.X + Pan.X,
+				Y = Skin.Patch.Size.Y + Pan.Y
 			};
 		}
 

@@ -13,6 +13,37 @@ class Button : Widget
 
 	private bool pressed;
 
+	protected override Skin ApplySkin(Skin skin)
+	{
+		var buttonSkin = skin.GetChild("class:Button");
+		if (buttonSkin != null)
+		{
+			return buttonSkin;
+		}
+
+		return base.ApplySkin(Skin);
+	}
+
+	public override void Resize()
+	{
+		base.Resize();
+
+		var size = Point.Zero;
+		foreach (var child in Children.list)
+		{
+			size.X = Math.Max(size.X, ((int)child.LocalPosition.X) + child.Size.X);
+			size.Y = Math.Max(size.Y, ((int)child.LocalPosition.Y) + child.Size.Y);
+
+			var childPosition = child.LocalPosition;
+			childPosition.X += Skin.Patch.Margin.X;
+			childPosition.Y += Skin.Patch.Margin.Y;
+			child.LocalPosition = childPosition;
+		}
+		size.X += Skin.Patch.Margin.X * 2;
+		size.Y += Skin.Patch.Margin.Y * 2;
+		Size = size;
+	}
+
 	public override void OnMouseLeave()
 	{
 		base.OnMouseLeave();
@@ -50,11 +81,11 @@ class Button : Widget
 	{
 		if (pressed)
 		{
-			spriteBatch.DrawPatch(SkinDEP.ButtonPressedPatch, Position, Size, Enabled ? Color : SkinDEP.DisabledColor);
+			spriteBatch.DrawPatch(Skin.PatchAlt, Position, Size, Enabled || !Skin.DisabledColor.HasValue ? Skin.Color : Skin.DisabledColor.Value);
 		}
 		else
 		{
-			spriteBatch.DrawPatch(SkinDEP.ButtonReleasedPatch, Position, Size, Enabled ? Color : SkinDEP.DisabledColor);
+			spriteBatch.DrawPatch(Skin.Patch, Position, Size, Enabled ? Color : SkinDEP.DisabledColor);
 		}
 
 		base.Draw(spriteBatch);

@@ -16,7 +16,7 @@ class Shop : Window
 		// maybe a simple description file?
 		// also what about shop icons etc... auto sprite pack them? yuumm. If all images are 16x16 that's easy peasy...
 		topLayout.Add<Image>().SetSprite(new Sprite(Asset.DefaultTexture, new Rectangle(4, 64, 28, 28)));
-		topLayout.Add<TextLabel>().SetText("Hello! Welcome to the\nminer's paradise! Help\nyourself my \"friend\".").Pack();
+		topLayout.Add<TextLabel>().SetText("Hello! Welcome to the\nminer's paradise! Help\nyourself my \"friend\".");
 		topLayout.PackHorizontally();
 
 		var bottomLayout = layout.Add<Layout>();

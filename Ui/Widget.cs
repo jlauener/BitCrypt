@@ -31,8 +31,7 @@ class Widget
 		get => skin != null ? skin : (Parent != null ? Parent.Skin : null);
 		set
 		{
-			skin = value;
-			OnSkinChanged(Skin);
+			skin = ApplySkin(value);
 		}
 	}
 
@@ -42,8 +41,9 @@ class Widget
 		return this;
 	}
 
-	protected virtual void OnSkinChanged(Skin skin)
+	protected virtual Skin ApplySkin(Skin skin)
 	{
+		return skin;
 	}
 
 	public Vector2 LocalPosition { get; set; }
@@ -68,7 +68,7 @@ class Widget
 		return SetOffset(new Vector2(x, y));
 	}
 
-	private Point? size;
+	protected Point? size;
 	public Point Size
 	{
 		get => size.HasValue ? size.Value : Parent.Size;
@@ -82,6 +82,14 @@ class Widget
 	public Widget SetSize(int w, int h)
 	{
 		return SetSize(new Point(w, h));
+	}
+
+	public virtual void Resize()
+	{
+		foreach (var child in Children.list)
+		{
+			child.Resize();
+		}
 	}
 
 	public Color Color { get; set; } = Color.White;
@@ -246,7 +254,7 @@ class Widget
 
 		if (skin == null && Parent != null && Parent.Skin != null)
 		{
-			Skin = skin;
+			Skin = Parent.Skin;
 		}
 	}
 

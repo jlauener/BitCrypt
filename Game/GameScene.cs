@@ -82,6 +82,11 @@ class GameScene : Scene
 		contentSkin.Color = Color.White;
 		contentSkin.Patch = new Patch(Asset.DefaultTexture, new Point(44, 105), new Point(2, 2));
 
+		var buttonSkin = windowSkin.CreateChild("class:Button");
+		buttonSkin.Patch = new Patch(Asset.DefaultTexture, new Point(49, 100), new Point(2, 2));
+		buttonSkin.PatchAlt = new Patch(Asset.DefaultTexture, new Point(49, 105), new Point(2, 2));
+
+
 		var window = desktop.Add<Window>();
 		window
 			.SetTitle("Hello!")
@@ -90,10 +95,13 @@ class GameScene : Scene
 		;
 
 		window.Content.Layout = PanelLayout.Vertical;
-		window.Content.Add<TextLabel>().SetText("label 1").Pack(); // TODO must be done automagically with Resize()
-		window.Content.Add<TextLabel>().SetText("label 2").Pack();
+		window.Content.Add<TextLabel>().SetText("label 1");
+		window.Content.Add<TextLabel>().SetText("label 2");
+		window.Content.Add<Button>().Add<TextLabel>().SetText("button").Center().SetSize(88, 12);
+		window.Content.Add<Button>().Add<TextLabel>().SetText("another button").Center();
+		window.Content.Add<Button>().Add<Image>().SetSprite(new Sprite(Asset.DefaultTexture, new Rectangle(32, 0, 16, 16)));
 
-		// TODO button, bar, close button, over fx, disabled fx, shadow and DONE!
+		// TODO, bar, close button, over fx, disabled fx, shadow and DONE!
 
 		//desktop.Add<TextLabel>()
 		//	.SetText("Hello World!")

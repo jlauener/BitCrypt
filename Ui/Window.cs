@@ -37,40 +37,40 @@ class Window : Widget
 	public override void OnAdded()
 	{
 		base.OnAdded();
-
-		//title.Patch = Skin.WindowTitlePatch;
 		Resize();
 	}
 
-	protected override void OnSkinChanged(Skin skin)
+	protected override Skin ApplySkin(Skin skin)
 	{
 		title.Skin = skin.GetChild("Title");
 		Content.Skin = skin.GetChild("Content");
+		return base.ApplySkin(skin);
 	}
 
-	public void Resize()
+	public override void Resize()
 	{
-		Content.Resize();
+		base.Resize();
+
 		Debug.Log("Content size={0}", Content.Size);
 
 		var titleLabelSize = titleLabel.Skin.Font.GetSize(titleLabel.Text);
-		var width = Math.Max(titleLabelSize.X + title.Skin.Patch.PatchSize.X * 2 + 2, Content.Size.X);
+		var width = Math.Max(titleLabelSize.X + title.Skin.Patch.Size.X * 2 + 2, Content.Size.X);
 
 		title.Size = new Point(width, 12);
 		titleLabel.Size = new Point(titleLabelSize.X, 12);
-		titleLabel.LocalPosition = new Vector2(title.Skin.Patch.PatchSize.X + 1, 0f);
+		titleLabel.LocalPosition = new Vector2(title.Skin.Patch.Size.X + 1, 0f);
 
 		Content.Size = new Point(width, Content.Size.Y);
 
-		title.SetLocalPosition(Skin.Patch.PatchSize.X + 1, Skin.Patch.PatchSize.Y + 1);
-		Content.SetLocalPosition(Skin.Patch.PatchSize.X + 1, Skin.Patch.PatchSize.Y  + title.Size.Y + 3);
+		title.SetLocalPosition(Skin.Patch.Size.X + 1, Skin.Patch.Size.Y + 1);
+		Content.SetLocalPosition(Skin.Patch.Size.X + 1, Skin.Patch.Size.Y  + title.Size.Y + 3);
 
 		// TODO if Content's size is not set window takes full screen... mmh. -> will be fixed with proper Resize() impl
 
 		Size = new Point
 		{
-			X = Content.Size.X + Skin.Patch.PatchSize.X * 2 + 2,
-			Y = title.Size.Y + Content.Size.Y + Skin.Patch.PatchSize.Y * 2 + 4
+			X = Content.Size.X + Skin.Patch.Size.X * 2 + 2,
+			Y = title.Size.Y + Content.Size.Y + Skin.Patch.Size.Y * 2 + 4
 		};
 	}
 

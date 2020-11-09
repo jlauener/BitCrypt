@@ -1,4 +1,5 @@
-﻿using Microsoft.Xna.Framework.Graphics;
+﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 
 enum HorizontalAlign
 {
@@ -98,10 +99,14 @@ class TextLabel : Label
 		return SetText(string.Format(format, args));
 	}
 
-	public TextLabel Pack()
+	public override void Resize()
 	{
-		Size = Skin.Font.GetSize(Text);
-		return this;
+		base.Resize();
+
+		if (!size.HasValue)
+		{
+			Size = Skin.Font.GetSize(Text);
+		}
 	}
 }
 

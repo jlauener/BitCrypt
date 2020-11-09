@@ -29,6 +29,7 @@ class Skin
 	public Color? ErrorColor { get; set; }
 	public Color? DisabledColor { get; set; }
 	public Patch Patch { get; set; }
+	public Patch PatchAlt { get; set; }
 
 	private readonly Dictionary<string, Skin> children = new Dictionary<string, Skin>();
 
