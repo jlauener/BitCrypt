@@ -17,86 +17,91 @@ class Panel : Widget
 	public Point? Margin { get; set; }
 	public Point Pan { get; set; } = new Point(2, 2);
 
-	public override void Resize()
+	public Panel()
 	{
-		base.Resize();
-
-		switch (Layout)
-		{
-			case PanelLayout.Vertical:
-				PackVertically();
-				break;
-			case PanelLayout.Horizontal:
-				PackHorizontally();
-				break;
-			case PanelLayout.None:
-				// TODO
-				break;
-		}
+		StyleClass = Style.Panel;
 	}
 
-	private void PackVertically()
-	{
-		var margin = GetMargin();
+	//public override void Resize()
+	//{
+	//	base.Resize();
 
-		var size = margin;
+	//	switch (Layout)
+	//	{
+	//		case PanelLayout.Vertical:
+	//			PackVertically();
+	//			break;
+	//		case PanelLayout.Horizontal:
+	//			PackHorizontally();
+	//			break;
+	//		case PanelLayout.None:
+	//			// TODO
+	//			break;
+	//	}
+	//}
 
-		for (var i = Children.Count - 1; i >= 0; i--)
-		{
-			var child = Children.list[i];
-			child.LocalPosition = new Vector2(margin.X, size.Y);
-			size.Y += child.Size.Y;
-			if (i > 0) size.Y += Pan.Y;
-			size.X = Math.Max(size.X, child.Size.X + margin.X);
-		};
+	//private void PackVertically()
+	//{
+	//	var margin = GetMargin();
 
-		size += margin;
-		Size = size;
-	}
+	//	var size = margin;
 
-	private void PackHorizontally()
-	{
-		var margin = GetMargin();
+	//	for (var i = Children.Count - 1; i >= 0; i--)
+	//	{
+	//		var child = Children.list[i];
+	//		child.LocalPosition = new Vector2(margin.X, size.Y);
+	//		size.Y += child.Size.Y;
+	//		if (i > 0) size.Y += Pan.Y;
+	//		size.X = Math.Max(size.X, child.Size.X + margin.X);
+	//	};
 
-		var size = margin;
+	//	size += margin;
+	//	Size = size;
+	//}
 
-		for (var i = Children.Count - 1; i >= 0; i--)
-		{
-			var child = Children.list[i];
-			child.LocalPosition = new Vector2(size.X, margin.Y);
-			size.X += child.Size.X;
-			if (i > 0) size.X += Pan.X;
-			size.Y = Math.Max(size.Y, child.Size.Y + margin.Y);
-		};
+	//private void PackHorizontally()
+	//{
+	//	var margin = GetMargin();
 
-		size += margin;
-		Size = size;
-	}
+	//	var size = margin;
 
-	private Point GetMargin()
-	{
-		if (Margin.HasValue)
-		{
-			return Margin.Value;
-		}
+	//	for (var i = Children.Count - 1; i >= 0; i--)
+	//	{
+	//		var child = Children.list[i];
+	//		child.LocalPosition = new Vector2(size.X, margin.Y);
+	//		size.X += child.Size.X;
+	//		if (i > 0) size.X += Pan.X;
+	//		size.Y = Math.Max(size.Y, child.Size.Y + margin.Y);
+	//	};
 
-		if (Skin.Patch != null)
-		{
-			return new Point
-			{
-				X = Skin.Patch.Size.X + Pan.X,
-				Y = Skin.Patch.Size.Y + Pan.Y
-			};
-		}
+	//	size += margin;
+	//	Size = size;
+	//}
 
-		return Point.Zero;
-	}
+	//private Point GetMargin()
+	//{
+	//	if (Margin.HasValue)
+	//	{
+	//		return Margin.Value;
+	//	}
+
+	//	//if (patch != null)
+	//	//{
+	//	//	return new Point
+	//	//	{
+	//	//		X = patch.Size.X + Pan.X,
+	//	//		Y = patch.Size.Y + Pan.Y
+	//	//	};
+	//	//}
+
+	//	return Point.Zero;
+	//}
 
 	public override void Draw(SpriteBatch spriteBatch)
 	{
-		if (Skin.Patch != null)
+		if (CurrentStyle.Patch != null)
 		{
-			spriteBatch.DrawPatch(Skin.Patch, Position, Size, Color);
+			spriteBatch.DrawPatch(CurrentStyle.Patch, Position, Size, ColorDEP);
 		}
 		base.Draw(spriteBatch);
 	}

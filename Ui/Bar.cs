@@ -1,7 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
-// TODO support other bar orientation (needed?)
+// TODO support other bar orientation
 class Bar : Widget
 {
 	private IntValue value;
@@ -33,16 +33,22 @@ class Bar : Widget
 		return this;
 	}
 
-	private Rectangle cutOut;
+	private Vector2 barOffset;
 	private Point barSize;
+	private Point currentSize;
+
+	public Bar()
+	{
+		StyleClass = Style.Bar;
+	}
 
 	public override void OnAdded()
 	{
 		base.OnAdded();
-
+		barOffset = new Vector2(Style.PatchAlt.Size.X, Style.PatchAlt.Size.Y);
 		barSize = Size;
-		barSize.X -= 4;
-		barSize.Y -= 4;
+		barSize.X -= Style.PatchAlt.Size.X * 2;
+		barSize.Y -= Style.PatchAlt.Size.Y * 2;
 		HandleValueChanged(IntValueChangedEvent.Init);
 	}
 
@@ -54,11 +60,8 @@ class Bar : Widget
 
 	public override void Draw(SpriteBatch spriteBatch)
 	{
-		spriteBatch.DrawPatch(SkinDEP.BarBackgroundPatch, Position, Size, Color);
-		
-		// TODO
-		//spriteBatch.DrawPatch(Skin.BarFramePatch, ScreenPosition + new Vector2(2f, 2f), barSize, Color, cutOut);
-
+		spriteBatch.DrawPatch(CurrentStyle.PatchAlt, Position, Size, CurrentStyle.Color);
+		spriteBatch.DrawPatch(CurrentStyle.Patch, Position + barOffset, currentSize, CurrentStyle.Color);
 		base.Draw(spriteBatch);
 	}
 
@@ -70,7 +73,7 @@ class Bar : Widget
 			pct = 1f - pct;
 		}
 
-		cutOut.Width = (int)(pct * barSize.X);
-		cutOut.Height = barSize.Y;
+		currentSize.X = (int)(pct * barSize.X);
+		currentSize.Y = barSize.Y;
 	}
 }

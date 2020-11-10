@@ -19,6 +19,8 @@ class Patch
 
 	private readonly Rectangle[] patches;
 
+	public Patch(Point patchOrigin, Point patchSize) : this(Asset.DefaultTexture, patchOrigin, patchSize) { }
+
 	public Patch(Texture2D texture, Point patchOrigin, Point patchSize)
 	{
 		this.texture = texture;

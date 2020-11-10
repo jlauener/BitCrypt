@@ -50,3 +50,8 @@ class Skin
 		return null;
 	}
 }
+
+// style is player, enemy, etc... class is label, button, etc.. could be an enum ?
+// Style.Get("style").GetClass(Class.Button) -> state: normal, over, disabled, error, + custom state...
+// Widget.SetStyle("style")
+// Child inherir style if not set

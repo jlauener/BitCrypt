@@ -25,26 +25,31 @@ class Widget
 		return this;
 	}
 
-	private Skin skin;
-	public Skin Skin
-	{
-		get => skin != null ? skin : (Parent != null ? Parent.Skin : null);
-		set
-		{
-			skin = ApplySkin(value);
-		}
-	}
+	public string StyleClass { get; set; }
 
-	public Widget SetSkin(Skin skin)
+	public Widget SetStyleClass(string styleClass)
 	{
-		Skin = skin;
+		StyleClass = styleClass;
 		return this;
 	}
 
-	protected virtual Skin ApplySkin(Skin skin)
+	private Style style;
+	public Style Style
 	{
-		return skin;
+		get => style;
+		set
+		{
+			style = StyleClass != null ? value.GetClass(StyleClass) : value;
+		}
 	}
+
+	public Widget SetStyle(Style style)
+	{
+		Style = style;
+		return this;
+	}
+
+	protected Style CurrentStyle { get; private set; }
 
 	public Vector2 LocalPosition { get; set; }
 	public Widget SetLocalPosition(Vector2 position)
@@ -84,19 +89,19 @@ class Widget
 		return SetSize(new Point(w, h));
 	}
 
-	public virtual void Resize()
-	{
-		foreach (var child in Children.list)
-		{
-			child.Resize();
-		}
-	}
+	//public virtual void Resize()
+	//{
+	//	foreach (var child in Children.list)
+	//	{
+	//		child.Resize();
+	//	}
+	//}
 
-	public Color Color { get; set; } = Color.White;
+	public Color ColorDEP { get; set; } = Color.White;
 
 	public Widget SetColor(Color color)
 	{
-		Color = color;
+		ColorDEP = color;
 		return this;
 	}
 
@@ -247,14 +252,9 @@ class Widget
 
 	public virtual void OnAdded()
 	{
-		//if (skinDEP == null && Parent != null && Parent.SkinDEP != null)
-		//{
-		//	ApplySkinDEP();
-		//}
-
-		if (skin == null && Parent != null && Parent.Skin != null)
+		if (Style == null && Parent != null && Parent.Style != null)
 		{
-			Skin = Parent.Skin;
+			Style = Parent.Style.GetClass(StyleClass);
 		}
 	}
 
@@ -288,10 +288,28 @@ class Widget
 	// TODO keep it like that, or have a system to register update? avoids going trough the full tree each frame. Worth it?
 	public virtual void Update()
 	{
+		// TODO added handling doesn't belong here
 		if (!added)
 		{
 			OnAdded();
 			added = true;
+		}
+
+		// TODO resolving patch state doesn't belong here, make it reactive
+		if (Style != null)
+		{
+			if (!Enabled)
+			{
+				CurrentStyle = Style.GetState(StyleState.Disabled);
+			}
+			else if (IsMouseOver)
+			{
+				CurrentStyle = Style.GetState(StyleState.Overed);
+			}
+			else
+			{
+				CurrentStyle = Style;
+			}
 		}
 
 		Children.ForEach((child) =>

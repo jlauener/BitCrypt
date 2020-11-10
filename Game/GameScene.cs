@@ -1,6 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using System.Runtime.InteropServices;
 
 // TODO implement cursor class
 class GameScene : Scene
@@ -8,7 +9,9 @@ class GameScene : Scene
 	private Widget rootWidget;
 	private Widget desktop;
 
-	private TextLabel debugLabel;
+	private Style styleDefault;
+	private Style style1;
+	//private TextLabel debugLabel;
 
 	public override void Init()
 	{
@@ -64,42 +67,39 @@ class GameScene : Scene
 
 		//Computer.CreateWindow(WindowData.Mine);		
 
-		var windowSkin = new Skin
-		{
-			Texture = Asset.DefaultTexture,
-			Font = Asset.DefaultFont,
-			Color = Color.White,
-			ErrorColor = new Color(0xBE, 0x26, 0x33),
-			DisabledColor = new Color(0x9D, 0x9D, 0x9D),
-			Patch = new Patch(Asset.DefaultTexture, new Point(32, 100), new Point(4, 4)),
-		};
+		//var windowSkin = new Skin
+		//{
+		//	Texture = Asset.DefaultTexture,
+		//	Font = Asset.DefaultFont,
+		//	Color = Color.White,
+		//	ErrorColor = new Color(0xBE, 0x26, 0x33),
+		//	DisabledColor = new Color(0x9D, 0x9D, 0x9D),
+		//	Patch = new Patch(Asset.DefaultTexture, new Point(32, 100), new Point(4, 4)),
+		//};
 
-		var titleSkin = windowSkin.CreateChild("Title");
-		titleSkin.Color = Color.Black;
-		titleSkin.Patch = new Patch(Asset.DefaultTexture, new Point(44, 100), new Point(2, 2));
+		//var titleSkin = windowSkin.CreateChild("Title");
+		//titleSkin.Color = Color.Black;
+		//titleSkin.Patch = new Patch(Asset.DefaultTexture, new Point(44, 100), new Point(2, 2));
 
-		var contentSkin = windowSkin.CreateChild("Content");
-		contentSkin.Color = Color.White;
-		contentSkin.Patch = new Patch(Asset.DefaultTexture, new Point(44, 105), new Point(2, 2));
+		//var contentSkin = windowSkin.CreateChild("Content");
+		//contentSkin.Color = Color.White;
+		//contentSkin.Patch = new Patch(Asset.DefaultTexture, new Point(44, 105), new Point(2, 2));
 
-		var buttonSkin = windowSkin.CreateChild("class:Button");
-		buttonSkin.Patch = new Patch(Asset.DefaultTexture, new Point(49, 100), new Point(2, 2));
-		buttonSkin.PatchAlt = new Patch(Asset.DefaultTexture, new Point(49, 105), new Point(2, 2));
+		//var buttonSkin = windowSkin.CreateChild("class:Button");
+		//buttonSkin.Patch = new Patch(Asset.DefaultTexture, new Point(49, 100), new Point(2, 2));
+		//buttonSkin.PatchAlt = new Patch(Asset.DefaultTexture, new Point(49, 105), new Point(2, 2));
 
+		styleDefault = CreateDefaultStyle();
+		style1 = CreateStyle1();
 
-		var window = desktop.Add<Window>();
-		window
-			.SetTitle("Hello!")
-			.SetSkin(windowSkin)
-			.SetLocalPosition(100, 100)
-		;
+		CreateWindow("DEFAULT", styleDefault);
 
-		window.Content.Layout = PanelLayout.Vertical;
-		window.Content.Add<TextLabel>().SetText("label 1");
-		window.Content.Add<TextLabel>().SetText("label 2");
-		window.Content.Add<Button>().Add<TextLabel>().SetText("button").Center().SetSize(88, 12);
-		window.Content.Add<Button>().Add<TextLabel>().SetText("another button").Center();
-		window.Content.Add<Button>().Add<Image>().SetSprite(new Sprite(Asset.DefaultTexture, new Rectangle(32, 0, 16, 16)));
+		//window.Content.Layout = PanelLayout.Vertical;
+		//window.Content.Add<TextLabel>().SetText("label 1");
+		//window.Content.Add<TextLabel>().SetText("label 2");
+		//window.Content.Add<Button>().Add<TextLabel>().SetText("button").Center().SetSize(88, 12);
+		//window.Content.Add<Button>().Add<TextLabel>().SetText("another button").Center();
+		//window.Content.Add<Button>().Add<Image>().SetSprite(new Sprite(Asset.DefaultTexture, new Rectangle(32, 0, 16, 16)));
 
 		// TODO, bar, close button, over fx, disabled fx, shadow and DONE!
 
@@ -110,18 +110,213 @@ class GameScene : Scene
 		//;
 	}
 
+	private Style CreateDefaultStyle()
+	{
+		// TODO it is not clear that this applies to the window frame, it's also inherited...
+		// it is good to inherir color and font, patch, shadowpatch...
+		// inhestir font/color is not much needed, default rules..
+		var style = new Style
+		{
+			Font = Asset.DefaultFont,
+			Color = Color.White,
+			Patch = new Patch(new Point(0, 100), new Point(5, 5)),
+			ShadowPatch = new Patch(new Point(0, 144), new Point(5, 5))
+		};
+
+		var windowTitle = style.AddClass(Style.WindowTitle, new Style
+		{
+			Patch = new Patch(new Point(11, 100), new Point(2, 2)),
+		});
+
+		windowTitle.AddClass(Style.Label, new Style
+		{
+			Font = Asset.LoadBitmapFont("font/04b_19.fnt"),
+			Color = new Color(0xDE, 0xEE, 0xD6),
+			ShadowOffset = new Vector2(1f, 1f)
+		})
+		.AddState(StyleState.Overed, new Style
+		{
+			Color = new Color(0xDA, 0xD4, 0x5E),
+		});
+
+		style.AddClass(Style.Panel, new Style
+		{
+			Color = Color.Black,
+			Patch = new Patch(new Point(16, 100), new Point(2, 2)),
+		});
+
+		style.AddClass(Style.Label, new Style
+		{
+			Color = new Color(0xDE, 0xEE, 0xD6),
+		})
+		.AddState(StyleState.Disabled, new Style
+		{
+			Color = new Color(0x4E, 0x4A, 0x4E),
+		});
+
+		var buttonStyle = style.AddClass(Style.Button, new Style
+		{
+			Color = Color.White,
+			Patch = new Patch(new Point(49, 100), new Point(2, 2)),
+		})
+		.AddState(StyleState.Alt, new Style
+		{
+			Patch = new Patch(new Point(49, 105), new Point(2, 2)),
+		})
+		.AddState(StyleState.Disabled, new Style
+		{
+			Patch = new Patch(new Point(54, 100), new Point(2, 2)),
+		})
+		.AddState(StyleState.Overed, new Style
+		{
+			Patch = new Patch(new Point(59, 100), new Point(2, 2)),
+		});
+
+		buttonStyle.AddClass(Style.Label, new Style
+		{
+			Color = Color.LightGray,
+		})
+		.AddState(StyleState.Overed, new Style
+		{
+			Color = Color.White,
+		})
+		.AddState(StyleState.Disabled, new Style
+		{
+			Color = Color.DarkGray,
+		});
+
+		style.AddClass(Style.Bar, new Style
+		{
+			Patch = new Patch(new Point(44, 112), new Point(1, 1)),
+			PatchAlt = new Patch(new Point(48, 112), new Point(1, 1)),
+		});
+
+		return style;
+	}
+
+	private Style CreateStyle1()
+	{
+		var style = new Style
+		{
+			Font = Asset.DefaultFont,
+			Color = Color.White,
+			Patch = new Patch(new Point(32, 100), new Point(4, 4)),
+		};
+
+		var windowTitle = style.AddClass(Style.WindowTitle, new Style
+		{
+			Patch = new Patch(new Point(44, 105), new Point(2, 2)),
+		});
+
+		windowTitle.AddClass(Style.Label, new Style
+		{
+			Color = Color.DarkGray,
+		})
+		.AddState(StyleState.Overed, new Style
+		{
+			Color = Color.LightGray,
+		});
+
+		style.AddClass(Style.Panel, new Style
+		{
+			Color = Color.Black,
+			Patch = new Patch(new Point(44, 100), new Point(2, 2)),
+		});
+
+		style.AddClass(Style.Label, new Style
+		{
+			Color = Color.White,
+		})
+		.AddState(StyleState.Disabled, new Style
+		{
+			Color = Color.LightGray,
+		});
+
+		var buttonStyle = style.AddClass(Style.Button, new Style
+		{
+			Color = Color.White,
+			Patch = new Patch(new Point(49, 100), new Point(2, 2)),
+		})
+		.AddState(StyleState.Alt, new Style
+		{
+			Patch = new Patch(new Point(49, 105), new Point(2, 2)),
+		})
+		.AddState(StyleState.Disabled, new Style
+		{
+			Patch = new Patch(new Point(54, 100), new Point(2, 2)),
+		})
+		.AddState(StyleState.Overed, new Style
+		{
+			Patch = new Patch(new Point(59, 100), new Point(2, 2)),
+		});
+
+		buttonStyle.AddClass(Style.Label, new Style
+		{
+			Color = Color.LightGray,
+		})
+		.AddState(StyleState.Overed, new Style
+		{
+			Color = Color.White,
+		})
+		.AddState(StyleState.Disabled, new Style
+		{
+			Color = Color.DarkGray,
+		});
+
+		style.AddClass(Style.Bar, new Style
+		{
+			Patch = new Patch(new Point(44, 112), new Point(1, 1)),
+			PatchAlt = new Patch(new Point(48, 112), new Point(1, 1)),
+		});
+
+		return style;
+	}
+
+	private void CreateWindow(string name, Style style)
+	{
+		var window = desktop.Add<Window>();
+		window
+			.SetTitle(name)
+			.SetStyle(style)
+			.SetSize(90, 120)
+		;
+
+		var panel = window.Add<Panel>().SetLocalPosition(6, 26).SetSize(78, 87);
+
+		panel.Add<TextLabel>().SetText("Enabled").SetLocalPosition(5, 6).SetSize(68, 8);
+		
+		var disabledLabel = panel.Add<TextLabel>().SetText("Disabled").SetLocalPosition(5, 18).SetSize(68, 8);
+		disabledLabel.Enabled = false;
+
+		panel.Add<Button>().SetLocalPosition(5, 30).SetSize(68, 12)
+			.Add<TextLabel>().SetText("Enabled").Center().SetSize(68, 12);
+		;
+
+		var disabledButton = panel.Add<Button>().SetLocalPosition(5, 44).SetSize(68, 12);
+		var disabledButtonLabel = disabledButton.Add<TextLabel>().SetText("Disabled").Center().SetSize(68, 12);
+		disabledButton.Enabled = false;
+		disabledButtonLabel.Enabled = false;
+
+		var barValue = new IntValue(12, 30);
+		panel.Add<Bar>().SetValue(barValue).SetLocalPosition(5, 58).SetSize(68, 12);
+
+		window.SetLocalPosition(window.GetRandomPosition());
+	}
+
 	public override void Update()
 	{
 		base.Update();
 
 		if (Input.WasKeyPressed(Keys.D1))
 		{
-			Computer.CreateWindow(WindowData.Mine);
+			CreateWindow("DEFAULT", styleDefault);
+			//Computer.CreateWindow(WindowData.Mine);
 		}
 
 		if (Input.WasKeyPressed(Keys.D2))
 		{
-			Computer.CreateWindow(WindowData.Vault);
+			CreateWindow("style 1", style1);
+			//Computer.CreateWindow(WindowData.Vault);
 		}
 
 		if (Input.WasKeyPressed(Keys.D3))

@@ -13,36 +13,30 @@ class Button : Widget
 
 	private bool pressed;
 
-	protected override Skin ApplySkin(Skin skin)
+	public Button()
 	{
-		var buttonSkin = skin.GetChild("class:Button");
-		if (buttonSkin != null)
-		{
-			return buttonSkin;
-		}
-
-		return base.ApplySkin(Skin);
+		StyleClass = Style.Button;
 	}
 
-	public override void Resize()
-	{
-		base.Resize();
+	//public override void Resize()
+	//{
+	//	base.Resize();
 
-		var size = Point.Zero;
-		foreach (var child in Children.list)
-		{
-			size.X = Math.Max(size.X, ((int)child.LocalPosition.X) + child.Size.X);
-			size.Y = Math.Max(size.Y, ((int)child.LocalPosition.Y) + child.Size.Y);
+	//	//var size = Point.Zero;
+	//	//foreach (var child in Children.list)
+	//	//{
+	//	//	size.X = Math.Max(size.X, ((int)child.LocalPosition.X) + child.Size.X);
+	//	//	size.Y = Math.Max(size.Y, ((int)child.LocalPosition.Y) + child.Size.Y);
 
-			var childPosition = child.LocalPosition;
-			childPosition.X += Skin.Patch.Margin.X;
-			childPosition.Y += Skin.Patch.Margin.Y;
-			child.LocalPosition = childPosition;
-		}
-		size.X += Skin.Patch.Margin.X * 2;
-		size.Y += Skin.Patch.Margin.Y * 2;
-		Size = size;
-	}
+	//	//	var childPosition = child.LocalPosition;
+	//	//	childPosition.X += releasedPatch.Margin.X;
+	//	//	childPosition.Y += releasedPatch.Margin.Y;
+	//	//	child.LocalPosition = childPosition;
+	//	//}
+	//	//size.X += releasedPatch.Margin.X * 2;
+	//	//size.Y += releasedPatch.Margin.Y * 2;
+	//	//Size = size;
+	//}
 
 	public override void OnMouseLeave()
 	{
@@ -79,15 +73,8 @@ class Button : Widget
 
 	public override void Draw(SpriteBatch spriteBatch)
 	{
-		if (pressed)
-		{
-			spriteBatch.DrawPatch(Skin.PatchAlt, Position, Size, Enabled || !Skin.DisabledColor.HasValue ? Skin.Color : Skin.DisabledColor.Value);
-		}
-		else
-		{
-			spriteBatch.DrawPatch(Skin.Patch, Position, Size, Enabled ? Color : SkinDEP.DisabledColor);
-		}
-
+		var currentStyle = pressed ? Style.GetState(StyleState.Alt) : CurrentStyle;
+		spriteBatch.DrawPatch(currentStyle.Patch, Position, Size, currentStyle.Color);
 		base.Draw(spriteBatch);
 	}
 

@@ -47,6 +47,8 @@ class Core : Game
 		// TODO support other monitor sizes
 		var width = 640;
 		var height = 360;
+		//var width = 960;
+		//var height = 540;
 
 		windowBounds = new Rectangle(0, 0, width * 2, height * 2);
 		fullscreenBounds = new Rectangle(0, 0, width * 3, height * 3);

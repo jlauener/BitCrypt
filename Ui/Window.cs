@@ -1,6 +1,5 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using System;
 
 // TODO window error state (blink title red?)
 class Window : Widget
@@ -21,58 +20,51 @@ class Window : Widget
 	private bool drag;
 	private Vector2 dragOffset;
 
-	private Panel title;
-	private TextLabel titleLabel;
-	public Panel Content;
+	private readonly Panel titlePanel;
+	private readonly TextLabel titleLabel;
 
 	public Window()
 	{
-		title = Add<Panel>();
-		titleLabel = title.Add<TextLabel>();
-		titleLabel.VerticalAlign = VerticalAlign.Center;
-
-		Content = Add<Panel>();
+		titlePanel = Add<Panel>();
+		titlePanel.StyleClass = Style.WindowTitle;
+		titleLabel = titlePanel.Add<TextLabel>();
+		Offset = new Vector2(-1f, -1f);
 	}
 
 	public override void OnAdded()
 	{
 		base.OnAdded();
-		Resize();
+
+		titlePanel.SetSize(Size.X - Style.Patch.Margin.X * 2, 18).SetLocalPosition(Style.Patch.Margin.X, Style.Patch.Margin.Y);
+		titleLabel.SetVerticalAlign(VerticalAlign.Center).SetSize(titlePanel.Size.X - 6, titlePanel.Size.Y).SetLocalPosition(4, -4);
 	}
 
-	protected override Skin ApplySkin(Skin skin)
-	{
-		title.Skin = skin.GetChild("Title");
-		Content.Skin = skin.GetChild("Content");
-		return base.ApplySkin(skin);
-	}
+	//public override void Resize()
+	//{
+	//	base.Resize();
 
-	public override void Resize()
-	{
-		base.Resize();
+	//	Debug.Log("Content size={0}", Content.Size);
 
-		Debug.Log("Content size={0}", Content.Size);
+	//	//var titleLabelSize = titleLabel.Skin.Font.GetSize(titleLabel.Text);
+	//	//var width = Math.Max(titleLabelSize.X + title.Skin.Patch.Size.X * 2 + 2, Content.Size.X);
 
-		var titleLabelSize = titleLabel.Skin.Font.GetSize(titleLabel.Text);
-		var width = Math.Max(titleLabelSize.X + title.Skin.Patch.Size.X * 2 + 2, Content.Size.X);
+	//	//title.Size = new Point(width, 12);
+	//	//titleLabel.Size = new Point(titleLabelSize.X, 12);
+	//	//titleLabel.LocalPosition = new Vector2(title.Skin.Patch.Size.X + 1, 0f);
 
-		title.Size = new Point(width, 12);
-		titleLabel.Size = new Point(titleLabelSize.X, 12);
-		titleLabel.LocalPosition = new Vector2(title.Skin.Patch.Size.X + 1, 0f);
+	//	//Content.Size = new Point(width, Content.Size.Y);
 
-		Content.Size = new Point(width, Content.Size.Y);
+	//	//title.SetLocalPosition(patch.Size.X + 1, patch.Size.Y + 1);
+	//	//Content.SetLocalPosition(patch.Size.X + 1, patch.Size.Y  + title.Size.Y + 3);
 
-		title.SetLocalPosition(Skin.Patch.Size.X + 1, Skin.Patch.Size.Y + 1);
-		Content.SetLocalPosition(Skin.Patch.Size.X + 1, Skin.Patch.Size.Y  + title.Size.Y + 3);
+	//	//// TODO if Content's size is not set window takes full screen... mmh. -> will be fixed with proper Resize() impl
 
-		// TODO if Content's size is not set window takes full screen... mmh. -> will be fixed with proper Resize() impl
-
-		Size = new Point
-		{
-			X = Content.Size.X + Skin.Patch.Size.X * 2 + 2,
-			Y = title.Size.Y + Content.Size.Y + Skin.Patch.Size.Y * 2 + 4
-		};
-	}
+	//	//Size = new Point
+	//	//{
+	//	//	X = Content.Size.X + patch.Size.X * 2 + 2,
+	//	//	Y = title.Size.Y + Content.Size.Y + patch.Size.Y * 2 + 4
+	//	//};
+	//}
 
 	public override void Update()
 	{
@@ -114,10 +106,11 @@ class Window : Widget
 
 		if (Draggable)
 		{
-			if (title.Contains(Input.MousePosition))
+			if (titlePanel.Contains(Input.MousePosition))
 			{
 				drag = true;
 				dragOffset = Position - Input.MousePosition;
+				Offset = new Vector2(-2f, -6f);
 			}
 		}
 	}
@@ -129,6 +122,7 @@ class Window : Widget
 		if (drag)
 		{
 			drag = false;
+			Offset = new Vector2(-1f, -1f);
 		}
 	}
 
@@ -144,21 +138,17 @@ class Window : Widget
 
 	public override void Draw(SpriteBatch spriteBatch)
 	{
-		spriteBatch.DrawPatch(Skin.Patch, Position, Size, Color);
-		//spriteBatch.DrawPatch(Skin.WindowTitlePatch, ScreenPosition, new Point(Size.X, 8), Color);
-		//spriteBatch.DrawPatch(Skin.WindowFramePatch, ScreenPosition + new Vector2(0f, 8f), new Point(Size.X, Size.Y - 8), Color);
-
-		//if (Title != null)
-		//{
-		//	spriteBatch.DrawText(Skin.WindowTitleFont, Position + new Vector2(4f, 2f), Title, Skin.WindowTitleTextColor);
-		//}
-
+		if (CurrentStyle.ShadowPatch != null)
+		{
+			spriteBatch.DrawPatch(CurrentStyle.ShadowPatch, Position - Offset, Size, new Color(0f, 0f, 0f, 0.5f));
+		}
+		spriteBatch.DrawPatch(CurrentStyle.Patch, Position, Size, Color.White);
 		base.Draw(spriteBatch);
 	}
 
 	public override string ToString()
 	{
-		return string.Format("[Window pos={0} title={1}]", Position, Title);
+		return string.Format("[Window pos={0} title={1}]", Position, "TODO");
 	}
 
 	public Vector2 GetRandomPosition()

@@ -65,7 +65,7 @@ class Layout : Widget
 	{
 		if (Background != null)
 		{
-			spriteBatch.DrawPatch(Background, Position, Size, Color);
+			spriteBatch.DrawPatch(Background, Position, Size, ColorDEP);
 		}
 
 		base.Draw(spriteBatch);

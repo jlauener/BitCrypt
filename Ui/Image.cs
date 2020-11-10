@@ -21,7 +21,7 @@ class Image : Widget
 
 	public override void Draw(SpriteBatch spriteBatch)
 	{
-		spriteBatch.DrawSprite(Sprite, Position, Color);
+		spriteBatch.DrawSprite(Sprite, Position, ColorDEP);
 		base.Draw(spriteBatch);
 	}
 }

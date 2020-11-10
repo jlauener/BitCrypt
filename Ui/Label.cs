@@ -40,12 +40,17 @@ abstract class Label : Widget
 		return this;
 	}
 
+	public Label()
+	{
+		StyleClass = Style.Label;
+	}
+
 	public override void Draw(SpriteBatch spriteBatch)
 	{
 		if (text != null)
 		{
 			var position = Position;
-			var size = Skin.Font.GetSize(text); // TODO Cache text size, again use dirty flag + Repaint() method !
+			var size = CurrentStyle.Font.GetSize(text); // TODO Cache text size, again use dirty flag + Repaint() method !
 
 			switch (HorizontalAlign)
 			{
@@ -67,7 +72,11 @@ abstract class Label : Widget
 					break;
 			}
 
-			spriteBatch.DrawText(Skin.Font, position, text, Enabled || !Skin.DisabledColor.HasValue ? Skin.Color : Skin.DisabledColor.Value);
+			if (CurrentStyle.ShadowOffset != Vector2.Zero)
+			{
+				spriteBatch.DrawText(CurrentStyle.Font, position + CurrentStyle.ShadowOffset, text, Color.Black);
+			}
+			spriteBatch.DrawText(CurrentStyle.Font, position, text, CurrentStyle.Color);
 		}
 	}
 
@@ -99,15 +108,15 @@ class TextLabel : Label
 		return SetText(string.Format(format, args));
 	}
 
-	public override void Resize()
-	{
-		base.Resize();
+	//public override void Resize()
+	//{
+	//	base.Resize();
 
-		if (!size.HasValue)
-		{
-			Size = Skin.Font.GetSize(Text);
-		}
-	}
+	//	if (!size.HasValue)
+	//	{
+	//		Size = CurrentStyle.Font.GetSize(Text);
+	//	}
+	//}
 }
 
 class ValueLabel : Label

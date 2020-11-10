@@ -17,6 +17,8 @@ class BitmapFont
 	}
 	private readonly Dictionary<char, CharInfo> charSet = new Dictionary<char, CharInfo>();
 
+	private int height;
+
 	private BitmapFont(BitmapFontReader.Font font)
 	{
 		texture = Asset.LoadTexture2D("font/" + font.Pages[0].File);
@@ -29,6 +31,8 @@ class BitmapFont
 				Offset = new Vector2(chr.XOffset, chr.YOffset),
 				XAdvance = chr.XAdvance
 			};
+
+			height = Math.Max(height, chr.Height);
 		}
 	}
 
@@ -49,7 +53,7 @@ class BitmapFont
 			{
 				width = Math.Max(currentWidth, width);
 				currentWidth = 0;
-				height += 10; // TODO font height
+				height += height;
 				continue;
 			}
 
