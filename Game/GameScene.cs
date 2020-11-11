@@ -1,7 +1,7 @@
-﻿using Microsoft.Xna.Framework;
+﻿using BitUi;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
-using System.Runtime.InteropServices;
 
 // TODO implement cursor class
 class GameScene : Scene
@@ -293,9 +293,8 @@ class GameScene : Scene
 		;
 
 		var disabledButton = panel.Add<Button>().SetLocalPosition(5, 44).SetSize(68, 12);
-		var disabledButtonLabel = disabledButton.Add<TextLabel>().SetText("Disabled").Center().SetSize(68, 12);
+		disabledButton.Add<TextLabel>().SetText("Disabled").Center().SetSize(68, 12);
 		disabledButton.Enabled = false;
-		disabledButtonLabel.Enabled = false;
 
 		var barValue = new IntValue(12, 30);
 		panel.Add<Bar>().SetValue(barValue).SetLocalPosition(5, 58).SetSize(68, 12);

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using BitUi;
+using System;
 
 class BuyButton : Button
 {
@@ -53,9 +54,7 @@ class BuyButton : Button
 		else if (BuyEnabled)
 		{
 			// TODO make this reactive ?
-			// TODO Enabled inheritance...
 			Enabled = Computer.Coin.Value >= Cost;
-			Get<Label>().Enabled = Enabled;
 		}
 		else
 		{

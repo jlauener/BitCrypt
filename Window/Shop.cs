@@ -1,11 +1,12 @@
-﻿using Microsoft.Xna.Framework;
+﻿using BitUi;
+using Microsoft.Xna.Framework;
 
 class Shop : Window
 {
 	public Shop()
 	{
 		Title = "Miner's supplies";
-		SkinDEP = WindowData.ShopSkin; // TODO fix the skin issue!!!
+		SkinDEP = WindowData.ShopSkin; // TODO fix the skin issue!!! -> FIXED
 
 		var layout = Add<Layout>();
 		layout.Margin = Point.Zero;

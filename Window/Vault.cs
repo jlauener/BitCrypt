@@ -1,4 +1,6 @@
-﻿class Vault : Window
+﻿using BitUi;
+
+class Vault : Window
 {
 	private const string TITLE_FORMAT = "Vault v1.{0}";
 	private const string LABEL_FORMAT = "+{0} MAX";

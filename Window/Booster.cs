@@ -1,4 +1,6 @@
-﻿class Booster : Window
+﻿using BitUi;
+
+class Booster : Window
 {
 	private const string TITLE_FORMAT = "Booster v1.{0}";
 
