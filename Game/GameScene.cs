@@ -17,10 +17,10 @@ class GameScene : Scene
 	{
 		base.Init();
 
-		rootWidget = new RootWidget().SetSize(Core.ScreenSize);
+		rootWidget = new RootWidget().SetSize(Core.Size);
 		desktop = rootWidget.Add<Widget>()
 			.SetLocalPosition(0f, 12f)
-			.SetSize(Core.ScreenSize.X, Core.ScreenSize.Y - 12);
+			.SetSize(Core.Size.X, Core.Size.Y - 12);
 
 		Computer.Init(desktop, diskMax: 1024, memMax: 512, coinMax: 512);
 

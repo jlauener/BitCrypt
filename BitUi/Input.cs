@@ -23,6 +23,8 @@ namespace BitUi
 		private static MouseState currentMouseState;
 		private static MouseState previousMouseState;
 
+		public static Vector2 ResolutionScale { get; set; } = Vector2.One;
+
 		public static void Update()
 		{
 			previousKeyboardState = currentKeyboardState;
@@ -31,8 +33,10 @@ namespace BitUi
 			currentKeyboardState = Keyboard.GetState();
 			currentMouseState = Mouse.GetState();
 
-			mousePosition.X = currentMouseState.Position.X;
-			mousePosition.Y = currentMouseState.Position.Y;
+			// TODO cast mouse to integer position to prevent window problem... dirty workaround?
+			// TODO not castin lead to display artifacts, strange...
+			mousePosition.X = (int)(currentMouseState.Position.X * ResolutionScale.X);
+			mousePosition.Y = (int)(currentMouseState.Position.Y * ResolutionScale.Y);
 		}
 
 		public static bool IsKeyDown(Keys key)

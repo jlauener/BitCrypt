@@ -9,7 +9,7 @@ using System.Linq;
 
 class Core : Game
 {
-	public static Point ScreenSize { get; private set; }
+	public static Point Size { get; private set; }
 	public static Core Instance { get; private set; }
 
 	public static Color BackgroundColor { get; set; }
@@ -46,21 +46,18 @@ class Core : Game
 		Debug.LogInfo("screen size is {0}x{1}", GraphicsDevice.DisplayMode.Width, GraphicsDevice.DisplayMode.Height);
 
 		// TODO support other monitor sizes
-		var width = 640;
-		var height = 360;
-		//var width = 960;
-		//var height = 540;
+		Size = new Point(640, 360);
+		//ScreenSize = new Point(960, 540);
 
-		windowBounds = new Rectangle(0, 0, width * 2, height * 2);
-		fullscreenBounds = new Rectangle(0, 0, width * 3, height * 3);
+		windowBounds = new Rectangle(0, 0, Size.X * 2, Size.Y * 2);
+		fullscreenBounds = new Rectangle(0, 0, Size.X * 3, Size.Y * 3);
 
 		UpdateBackbufferSize();
 		graphics.ApplyChanges();
 
-		renderTarget = new RenderTarget2D(GraphicsDevice, width, height);
+		renderTarget = new RenderTarget2D(GraphicsDevice, Size.X, Size.Y);
 
-		ScreenSize = new Point(width, height);
-		Debug.LogInfo("game size is {0}", ScreenSize);
+		Debug.LogInfo("game size is {0}", Size);
 
 		base.Initialize();
 	}
@@ -125,6 +122,12 @@ class Core : Game
 		var bounds = graphics.IsFullScreen ? fullscreenBounds : windowBounds;
 		graphics.PreferredBackBufferWidth = bounds.Width;
 		graphics.PreferredBackBufferHeight = bounds.Height;
+
+		Input.ResolutionScale = new Vector2
+		{
+			X = Size.X / (float)bounds.Width,
+			Y = Size.Y / (float)bounds.Height
+		};
 	}
 
 	public static Scene Scene

@@ -165,10 +165,11 @@ namespace BitUi
 
 		public Vector2 GetRandomPosition()
 		{
+			// TODO if window position is not an integer, there might be display offset
 			return new Vector2
 			{
-				X = Core.Random.NextFloat(Parent.Size.X - Size.X),
-				Y = Core.Random.NextFloat(Parent.Size.Y - Size.Y)
+				X = ((int)Core.Random.NextFloat(Parent.Size.X - Size.X)),
+				Y = ((int)Core.Random.NextFloat(Parent.Size.Y - Size.Y))
 			};
 		}
 	}
