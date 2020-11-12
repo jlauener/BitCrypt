@@ -16,8 +16,8 @@ namespace BitUi
 		public PanelLayout Layout { get; set; }
 
 		// TODO use child's margin for pan, make margin a widget thingy...
-		public Point? Margin { get; set; }
-		public Point Pan { get; set; } = new Point(2, 2);
+		public Point? MarginDEP { get; set; }
+		public Point PanDEP { get; set; } = new Point(2, 2);
 
 		public Panel()
 		{

@@ -18,7 +18,6 @@ namespace BitUi
 
 		private readonly Texture2D texture;
 		public Point Size { get; }
-		public Point Margin { get; }
 
 		private readonly Rectangle[] patches;
 
@@ -28,7 +27,6 @@ namespace BitUi
 		{
 			this.texture = texture;
 			Size = patchSize;
-			Margin = new Point(Size.X + 1, Size.Y + 1);
 
 			patches = new Rectangle[9];
 			patches[TOP_LEFT] = new Rectangle(patchOrigin.X, patchOrigin.Y, patchSize.X, patchSize.Y);

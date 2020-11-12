@@ -120,12 +120,16 @@ class GameScene : Scene
 			Font = Asset.DefaultFont,
 			Color = Color.White,
 			Patch = new Patch(new Point(0, 100), new Point(5, 5)),
-			ShadowPatch = new Patch(new Point(0, 144), new Point(5, 5))
+			Margin = new Point(6, 6),
+			ShadowPatch = new Patch(new Point(0, 144), new Point(5, 5)),
+			WindowDragSfx = Asset.LoadSoundEffect("sfx/window_drag.wav"),
+			WindowDropSfx = Asset.LoadSoundEffect("sfx/window_drop.wav"),
 		};
 
 		var windowTitle = style.AddClass(Style.WindowTitle, new Style
 		{
 			Patch = new Patch(new Point(11, 100), new Point(2, 2)),
+			Margin = new Point(3, 3),
 		});
 
 		windowTitle.AddClass(Style.Label, new Style
@@ -158,6 +162,8 @@ class GameScene : Scene
 		{
 			Color = Color.White,
 			Patch = new Patch(new Point(49, 100), new Point(2, 2)),
+			ButtonPressedSfx = Asset.LoadSoundEffect("sfx/button_pressed.wav"),
+			ErrorSfx = Asset.LoadSoundEffect("sfx/error.wav"),
 		})
 		.AddState(StyleState.Alt, new Style
 		{

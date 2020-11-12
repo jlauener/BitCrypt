@@ -1,6 +1,8 @@
 ﻿using BitUi;
+using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Graphics;
 using System.Collections.Generic;
+using System.IO;
 
 namespace BitUi
 {
@@ -34,6 +36,19 @@ namespace BitUi
 			if (!TryGetAsset<BitmapFont>(path, out var asset))
 			{
 				asset = BitmapFont.FromFile(GetAssetPath(path));
+				store[path] = asset;
+			}
+			return asset;
+		}
+
+		public static SoundEffect LoadSoundEffect(string path)
+		{
+			if (!TryGetAsset<SoundEffect>(path, out var asset))
+			{
+				using (var fs = new FileStream(GetAssetPath(path), FileMode.Open))
+				{
+					asset = SoundEffect.FromStream(fs);
+				}
 				store[path] = asset;
 			}
 			return asset;

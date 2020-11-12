@@ -45,8 +45,13 @@ namespace BitUi
 		{
 			base.OnMouseLeave();
 
-			pressed = false;
-			Children.ForEach((child) => child.Offset = Vector2.Zero);
+			if (pressed)
+			{
+				pressed = false;
+				Children.ForEach((child) => child.Offset = Vector2.Zero);
+
+				Style.ButtonReleasedSfx?.Play();
+			}
 		}
 
 		public override void OnMousePressed()
@@ -57,6 +62,12 @@ namespace BitUi
 			{
 				pressed = true;
 				Children.ForEach((child) => child.Offset = new Vector2(1f, 1f));
+
+				Style.ButtonPressedSfx?.Play();
+			}
+			else
+			{
+				Style.ErrorSfx?.Play();
 			}
 
 			// TODO what if button is disabled/enabled while pressed?
@@ -71,6 +82,8 @@ namespace BitUi
 				OnPressed?.Invoke();
 				pressed = false;
 				Children.ForEach((child) => child.Offset = Vector2.Zero);
+
+				Style.ButtonReleasedSfx?.Play();
 			}
 		}
 

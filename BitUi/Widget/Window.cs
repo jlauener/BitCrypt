@@ -38,8 +38,12 @@ namespace BitUi
 		{
 			base.OnAdded();
 
-			titlePanel.SetSize(Size.X - Style.Patch.Margin.X * 2, 18).SetLocalPosition(Style.Patch.Margin.X, Style.Patch.Margin.Y);
-			titleLabel.SetVerticalAlign(VerticalAlign.Center).SetSize(titlePanel.Size.X - 6, titlePanel.Size.Y).SetLocalPosition(6, 0);
+			titlePanel.SetSize(Size.X - Style.Margin.X * 2, 18).SetLocalPosition(Style.Margin.X, Style.Margin.Y);
+			titleLabel
+				.SetVerticalAlign(VerticalAlign.Center)
+				.SetSize(titlePanel.Size.X - 6, titlePanel.Size.Y)
+				.SetLocalPosition(6, 0)
+			;
 		}
 
 		//public override void Resize()
@@ -114,6 +118,8 @@ namespace BitUi
 					drag = true;
 					dragOffset = Position - Input.MousePosition;
 					Offset = new Vector2(-2f, -6f);
+
+					Style.WindowDragSfx?.Play();
 				}
 			}
 		}
@@ -126,6 +132,8 @@ namespace BitUi
 			{
 				drag = false;
 				Offset = new Vector2(-1f, -1f);
+
+				Style.WindowDropSfx?.Play();
 			}
 		}
 
@@ -133,6 +141,7 @@ namespace BitUi
 		{
 			base.OnMouseLeave();
 
+			// TODO mouse leave should stop drag... related to other mouse event issue
 			if (drag)
 			{
 				drag = false;

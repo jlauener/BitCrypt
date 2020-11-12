@@ -1,4 +1,5 @@
 ﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Audio;
 using System.Collections.Generic;
 
 namespace BitUi
@@ -23,6 +24,14 @@ namespace BitUi
 		public BitmapFont Font { get; set; }
 		public Patch Patch { get; set; }
 		public Patch PatchAlt { get; set; }
+		public Point Margin { get; set; }
+
+		// TODO should be in WindowStyle... Replace class by real class?
+		public SoundEffect WindowDragSfx { get; set; }
+		public SoundEffect WindowDropSfx { get; set; }
+		public SoundEffect ButtonPressedSfx { get; set; }
+		public SoundEffect ButtonReleasedSfx { get; set; }
+		public SoundEffect ErrorSfx { get; set; }
 
 		private Color? color;
 		public Color Color
