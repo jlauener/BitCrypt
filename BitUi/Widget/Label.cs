@@ -48,6 +48,20 @@ namespace BitUi
 			StyleClass = Style.Label;
 		}
 
+		public override void Resize()
+		{
+			base.Resize();
+
+			if (Size.X == 0 || Size.Y == 0)
+			{
+				var textSize = Style.Font.GetSize(text); // TODO Cache text size, again use dirty flag + Repaint() method !
+				var size = Size;
+				if (size.X == 0) size.X = textSize.X;
+				if (size.Y == 0) size.Y = textSize.Y;
+				Size = size;
+			}
+		}
+
 		public override void Draw(SpriteBatch spriteBatch)
 		{
 			if (text != null)

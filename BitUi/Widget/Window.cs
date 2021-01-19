@@ -5,7 +5,7 @@ namespace BitUi
 {
 
 	// TODO window error state (blink title red?)
-	public class Window : Widget
+	public class Window : Layout
 	{
 		public string Title
 		{
@@ -28,10 +28,14 @@ namespace BitUi
 
 		public Window()
 		{
+			LayoutType = LayoutType.Vertical;
+			Offset = new Vector2(-1f, -1f);
+
 			titlePanel = Add<Panel>();
 			titlePanel.StyleClass = Style.WindowTitle;
+			titlePanel.LayoutType = LayoutType.Horizontal;
+
 			titleLabel = titlePanel.Add<TextLabel>();
-			Offset = new Vector2(-1f, -1f);
 		}
 
 		public override void OnAdded()

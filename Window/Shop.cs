@@ -8,10 +8,10 @@ class Shop : Window
 		Title = "Miner's supplies";
 		SkinDEP = WindowData.ShopSkin; // TODO fix the skin issue!!! -> FIXED
 
-		var layout = Add<Layout>();
+		var layout = Add<LayoutDEP>();
 		layout.Margin = Point.Zero;
 
-		var topLayout = layout.Add<Layout>();
+		var topLayout = layout.Add<LayoutDEP>();
 		topLayout.Pan.X = 8;
 		// TODO better way to get the sprites, and stuffs from the skin.
 		// maybe a simple description file?
@@ -20,7 +20,7 @@ class Shop : Window
 		topLayout.Add<TextLabel>().SetText("Hello! Welcome to the\nminer's paradise! Help\nyourself my \"friend\".");
 		topLayout.PackHorizontally();
 
-		var bottomLayout = layout.Add<Layout>();
+		var bottomLayout = layout.Add<LayoutDEP>();
 		bottomLayout.Pan.X = 16;
 
 		bottomLayout.Add<BuyButton>()

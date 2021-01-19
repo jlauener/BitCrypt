@@ -21,25 +21,27 @@ namespace BitUi
 			StyleClass = Style.Button;
 		}
 
-		//public override void Resize()
-		//{
-		//	base.Resize();
+		public override void Resize()
+		{
+			base.Resize();
 
-		//	//var size = Point.Zero;
-		//	//foreach (var child in Children.list)
-		//	//{
-		//	//	size.X = Math.Max(size.X, ((int)child.LocalPosition.X) + child.Size.X);
-		//	//	size.Y = Math.Max(size.Y, ((int)child.LocalPosition.Y) + child.Size.Y);
-
-		//	//	var childPosition = child.LocalPosition;
-		//	//	childPosition.X += releasedPatch.Margin.X;
-		//	//	childPosition.Y += releasedPatch.Margin.Y;
-		//	//	child.LocalPosition = childPosition;
-		//	//}
-		//	//size.X += releasedPatch.Margin.X * 2;
-		//	//size.Y += releasedPatch.Margin.Y * 2;
-		//	//Size = size;
-		//}
+			if (Size.X == 0 || Size.Y == 0)
+			{
+				var size = Point.Zero;
+				foreach (var child in Children.list)
+				{
+					var childPosition = child.LocalPosition;
+					size.X = Math.Max(size.X, ((int)childPosition.X) + child.Size.X);
+					size.Y = Math.Max(size.Y, ((int)childPosition.Y) + child.Size.Y);
+					childPosition.X += Style.Margin.X;
+					childPosition.Y += Style.Margin.Y;
+					child.LocalPosition = childPosition;
+				}
+				size.X += Style.Margin.X * 2;
+				size.Y += Style.Margin.Y * 2;
+				ApplyAutoSize(size);
+			}
+		}
 
 		public override void OnMouseLeave()
 		{

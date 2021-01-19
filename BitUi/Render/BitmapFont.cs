@@ -71,7 +71,7 @@ namespace BitUi
 			}
 			width = Math.Max(currentWidth, width);
 
-			return new Point(width - 1, height);
+			return new Point(width, height);
 		}
 
 		public void Draw(SpriteBatch spriteBatch, Vector2 position, string text, Color color)

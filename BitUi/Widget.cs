@@ -76,29 +76,58 @@ namespace BitUi
 			return SetOffset(new Vector2(x, y));
 		}
 
-		protected Point? size;
-		public Point Size
-		{
-			get => size.HasValue ? size.Value : Parent.Size;
-			set => size = value;
-		}
+		//protected Point? size;
+		public Point Size { get; set; }
+		//{
+			//get => size.HasValue ? size.Value : Parent.Size;
+			//set => size = value;
+		//}
+
 		public Widget SetSize(Point size)
 		{
 			Size = size;
 			return this;
 		}
+
 		public Widget SetSize(int w, int h)
 		{
 			return SetSize(new Point(w, h));
 		}
 
-		//public virtual void Resize()
-		//{
-		//	foreach (var child in Children.list)
-		//	{
-		//		child.Resize();
-		//	}
-		//}
+		public Widget SetWidth(int w)
+		{
+			Size = new Point { X = w, Y = Size.Y };
+			return this;
+		}
+
+		public Widget SetHeight(int w)
+		{
+			Size = new Point { X = w, Y = Size.Y };
+			return this;
+		}
+
+		public virtual void Resize()
+		{
+			var size = Size;
+
+			if (size.X == -1) size.X = Parent.Size.X;
+			if (size.Y == -1) size.Y = Parent.Size.Y;
+
+			foreach (var child in Children.list)
+			{
+				child.Resize();
+			}
+
+			Size = size;
+		}
+
+		protected void ApplyAutoSize(Point autoSize)
+		{
+			var size = Size;
+			if (size.X == 0) size.X = autoSize.X;
+			if (size.Y == 0) size.Y = autoSize.Y;
+			Size = size;
+		}
 
 		public Color ColorDEP { get; set; } = Color.White;
 

@@ -92,7 +92,7 @@ class GameScene : Scene
 		styleDefault = CreateDefaultStyle();
 		style1 = CreateStyle1();
 
-		CreateWindow("DEFAULT", styleDefault);
+		//CreateWindow("DEFAULT", styleDefault);
 
 		//window.Content.Layout = PanelLayout.Vertical;
 		//window.Content.Add<TextLabel>().SetText("label 1");
@@ -108,6 +108,57 @@ class GameScene : Scene
 		//	.SetSkin(WindowData.PlayerSkin)
 		//	.SetLocalPosition(108, 108)
 		//;
+
+		var testPanel1 = desktop.Add<Panel>()
+			.SetLayoutType(LayoutType.Vertical)
+			.SetStyle(styleDefault) // TODO autostyle
+			.SetLocalPosition(10, 10)
+			.SetSize(200, 100)
+		;
+
+		testPanel1.Add<TextLabel>()
+			.SetText("Hello World")
+			.Center()
+			.SetStyle(styleDefault) // TODO autostyle
+		;
+
+		testPanel1.Add<TextLabel>()
+			.SetText("label 2")
+			.Center()
+			.SetStyle(styleDefault) // TODO autostyle
+		;
+
+		testPanel1.Add<Button>()
+			.SetStyle(styleDefault) // TODO autostyle
+			.Add<TextLabel>().SetText("button").Center().SetStyle(styleDefault).SetWidth(80)
+		;
+
+		testPanel1.Add<Button>()
+			.SetStyle(styleDefault) // TODO autostyle
+			.Add<TextLabel>().SetText("button2").Center().SetStyle(styleDefault).SetWidth(80)
+		;
+
+		var testPanel2 = desktop.Add<Panel>()
+			.SetLayoutType(LayoutType.Vertical)
+			.SetStyle(styleDefault)
+			.SetLocalPosition(300, 10)
+		//.SetSize(100, 20)
+		;
+
+		testPanel2.Add<TextLabel>()
+			.SetText("Hello World")
+			.Center()
+			.SetStyle(styleDefault)
+		;
+
+		testPanel2.Add<TextLabel>()
+			.SetText("label 2")
+			.Center()
+			.SetStyle(styleDefault)
+		;
+
+		testPanel1.Resize();
+		testPanel2.Resize();
 	}
 
 	private Style CreateDefaultStyle()
@@ -147,6 +198,8 @@ class GameScene : Scene
 		{
 			Color = Color.Black,
 			Patch = new Patch(new Point(16, 100), new Point(2, 2)),
+			Margin = new Point(3, 3),
+			Pan = new Point(4, 4),
 		});
 
 		style.AddClass(Style.Label, new Style
@@ -162,6 +215,7 @@ class GameScene : Scene
 		{
 			Color = Color.White,
 			Patch = new Patch(new Point(49, 100), new Point(2, 2)),
+			Margin = new Point(5, 5),
 			ButtonPressedSfx = Asset.LoadSoundEffect("sfx/button_pressed.wav"),
 			ErrorSfx = Asset.LoadSoundEffect("sfx/error.wav"),
 		})
@@ -227,6 +281,7 @@ class GameScene : Scene
 		{
 			Color = Color.Black,
 			Patch = new Patch(new Point(44, 100), new Point(2, 2)),
+			Margin = new Point(3, 3),
 		});
 
 		style.AddClass(Style.Label, new Style
@@ -287,23 +342,36 @@ class GameScene : Scene
 			.SetSize(90, 120)
 		;
 
-		var panel = window.Add<Panel>().SetLocalPosition(6, 26).SetSize(78, 87);
+		var panel = window.Add<Panel>();
+		panel
+			.SetLayoutType(LayoutType.Vertical)
+			.SetStyle(style) // TODO autoset
+			.SetLocalPosition(6, 26)
+			//.SetSize(78, 87)
+		;
 
-		panel.Add<TextLabel>().SetText("Enabled").SetLocalPosition(5, 6).SetSize(68, 8);
-		
-		var disabledLabel = panel.Add<TextLabel>().SetText("Disabled").SetLocalPosition(5, 18).SetSize(68, 8);
-		disabledLabel.Enabled = false;
+		panel.Add<TextLabel>()
+			.SetText("Enabled")
+			//.SetLocalPosition(5, 6)
+			.SetSize(68, 8);
 
-		panel.Add<Button>().SetLocalPosition(5, 30).SetSize(68, 12)
+		//var disabledLabel = panel.Add<TextLabel>().SetText("Disabled").SetLocalPosition(5, 18).SetSize(68, 8);
+		//disabledLabel.Enabled = false;
+
+		panel.Add<Button>()
+			//.SetLocalPosition(5, 30)
+			.SetSize(68, 12)
 			.Add<TextLabel>().SetText("Enabled").Center().SetSize(68, 12);
 		;
 
-		var disabledButton = panel.Add<Button>().SetLocalPosition(5, 44).SetSize(68, 12);
-		disabledButton.Add<TextLabel>().SetText("Disabled").Center().SetSize(68, 12);
-		disabledButton.Enabled = false;
+		panel.Resize(); // TODO autocall
+		window.Resize();
+		//var disabledButton = panel.Add<Button>().SetLocalPosition(5, 44).SetSize(68, 12);
+		//disabledButton.Add<TextLabel>().SetText("Disabled").Center().SetSize(68, 12);
+		//disabledButton.Enabled = false;
 
-		var barValue = new IntValue(12, 30);
-		panel.Add<Bar>().SetValue(barValue).SetLocalPosition(5, 58).SetSize(68, 12);
+		//var barValue = new IntValue(12, 30);
+		//panel.Add<Bar>().SetValue(barValue).SetLocalPosition(5, 58).SetSize(68, 12);
 
 		window.SetLocalPosition(window.GetRandomPosition());
 	}

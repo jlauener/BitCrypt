@@ -25,6 +25,7 @@ namespace BitUi
 		public Patch Patch { get; set; }
 		public Patch PatchAlt { get; set; }
 		public Point Margin { get; set; }
+		public Point Pan { get; set; }
 
 		// TODO should be in WindowStyle... Replace class by real class?
 		public SoundEffect WindowDragSfx { get; set; }
